@@ -68,7 +68,7 @@ In the development process, we start with the creation of a data collection soft
   <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/0854f7b6-7478-4510-8a07-15520c0716b8" />
 </p>
 
-## technology
+## Technology
 
 <p align="center">
   <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/74a00e03-31be-4182-bf17-e19c4f0cb024" />

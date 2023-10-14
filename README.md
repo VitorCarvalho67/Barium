@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="https://i.imgur.com/UZzan6H.png" alt="Imagem logo" />
+  <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/c3067279-4aee-4b25-851b-8ebe5fe9449d" />
 </p>
 
 # Barium Human-Machine Interface (HMI)

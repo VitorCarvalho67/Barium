@@ -65,7 +65,7 @@ In the development process, we start with the creation of a data collection soft
 ## Dataset
 
 <p align="center">
-  <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/0854f7b6-7478-4510-8a07-15520c0716b8" />
+  <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/e036d641-13af-40fd-bda5-18aee6fab524" />
 </p>
 
 ## Technology

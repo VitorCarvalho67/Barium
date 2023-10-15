@@ -62,7 +62,7 @@ The software should now be active, and you can interact with your computer using
 
 In the development process, we start with the creation of a data collection software to build our custom dataset. Next, we move on to developing a neural network, utilizing deep learning and convolutional neural networks (CNN). Finally, we create software that employs this network to recognize real-time movements and execute corresponding actions.
 
-## DataSet
+## Dataset
 
 <p align="center">
   <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/0854f7b6-7478-4510-8a07-15520c0716b8" />

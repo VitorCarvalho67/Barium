@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/ba1d2492-abda-41f8-ad38-cb5aa13716c2" />
+  <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/c3067279-4aee-4b25-851b-8ebe5fe9449d" />
 </p>
 
 

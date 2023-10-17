@@ -1,7 +1,8 @@
 
 <p align="center">
-  <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/c3067279-4aee-4b25-851b-8ebe5fe9449d" />
+  <img src="https://github.com/Daniel-Alvarenga/Barium/assets/128755697/6062d456-7840-4df6-b325-0d7b3380e9d5" />
 </p>
+
 
 # Barium Human-Machine Interface (HMI)
 

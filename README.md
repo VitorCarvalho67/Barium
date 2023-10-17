@@ -1,7 +1,8 @@
 
 <p align="center">
-  <img src="https://github.com/Daniel-Alvarenga/Barium/assets/128755697/6062d456-7840-4df6-b325-0d7b3380e9d5" />
+  <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/ba1d2492-abda-41f8-ad38-cb5aa13716c2" />
 </p>
+
 
 
 # Barium Human-Machine Interface (HMI)
@@ -72,7 +73,7 @@ In the development process, we start with the creation of a data collection soft
 ## Technology
 
 <p align="center">
-  <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/74a00e03-31be-4182-bf17-e19c4f0cb024" />
+  <img src="https://github.com/Daniel-Alvarenga/Barium/assets/128755697/6062d456-7840-4df6-b325-0d7b3380e9d5" />
 </p>
 
 ## Contribute

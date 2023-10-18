@@ -4,8 +4,9 @@ Arquivo para fazer a coleta de dados e transformar em um dataset
 Objetivo: Criar um dataset com os dados coletados através da webcam para treinar um modelo de machine learning
 
 Colunas do dataset:
-p0_0,p1_0,p2_0,p3_0,p4_0,p5_0,p6_0,p7_0,p8_0,p9_0,p10_0,p11_0,p12_0,p13_0,p14_0,p15_0,p16_0,p17_0,p18_0,p19_0,p20_0,diagonal0,referencial0,p0_1,p1_1,p2_1,p3_1,p4_1,p5_1,p6_1,p7_1,p8_1,p9_1,p10_1,p11_1,p12_1,p13_1,p14_1,p15_1,p16_1,p17_1,p18_1,p19_1,p20_1,diagonal1,referencial1 ... p0_19,p1_19,p2_19,p3_19,p4_19,p5_19,p6_19,p7_19,p8_19,p9_19,p10_19,p11_19,p12_19,p13_19,p14_19,p15_19,p16_19,p17_19,p18_19,p19_19,p20_19,diagonal19,referencial19,
-movimento
+```csv
+p0_0,p1_0,p2_0,p3_0,p4_0,p5_0,p6_0,p7_0,p8_0,p9_0,p10_0,p11_0,p12_0,p13_0,p14_0,p15_0,p16_0,p17_0,p18_0,p19_0,p20_0,diagonal0,referencial0,p0_1,p1_1,p2_1,p3_1,p4_1,p5_1,p6_1,p7_1,p8_1,p9_1,p10_1,p11_1,p12_1,p13_1,p14_1,p15_1,p16_1,p17_1,p18_1,p19_1,p20_1,diagonal1,referencial1 ... p0_19,p1_19,p2_19,p3_19,p4_19,p5_19,p6_19,p7_19,p8_19,p9_19,p10_19,p11_19,p12_19,p13_19,p14_19,p15_19,p16_19,p17_19,p18_19,p19_19,p20_19,diagonal19,referencial19,movimento
+```
 
 Onde:
 p0 até p20 são os pontos da mão

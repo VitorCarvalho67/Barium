@@ -3,6 +3,8 @@
   <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/c3067279-4aee-4b25-851b-8ebe5fe9449d" />
 </p>
 
+
+
 # Barium Human-Machine Interface (HMI)
 
 An innovative software that utilizes neural networks, machine learning, and deep learning for tracking body movements, such as hands, enabling advanced interactions with the operating system, including predefined actions and a virtual mouse. Additionally, the project employs 4D neural network training techniques, where time is one of the dimensions, opening up revolutionary possibilities in various technology fields
@@ -71,7 +73,7 @@ In the development process, we start with the creation of a data collection soft
 ## Technology
 
 <p align="center">
-  <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/74a00e03-31be-4182-bf17-e19c4f0cb024" />
+  <img src="https://github.com/Daniel-Alvarenga/Barium/assets/128755697/6062d456-7840-4df6-b325-0d7b3380e9d5" />
 </p>
 
 ## Contribute

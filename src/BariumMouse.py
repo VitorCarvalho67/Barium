@@ -43,7 +43,7 @@ def calcular_distancia(ponto1, ponto2):
 
 modo_mouse = False
 
-captura = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0)
 mp_maos = mp.solutions.hands
 maos = mp_maos.Hands(max_num_hands=1)
 
@@ -65,7 +65,7 @@ while True:
         for a in range(21):
             coordenadas.append((0, 0))
 
-        sucesso, frame = captura.read()
+        sucesso, frame = cap.read()
         if not sucesso:
             continue
 
@@ -310,5 +310,5 @@ while True:
     if input_v == '0':
         exit
 
-        captura.release()
+        cap.release()
         cv2.destroyAllWindows()

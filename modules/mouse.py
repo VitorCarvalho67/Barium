@@ -9,14 +9,14 @@ def mouse_virtual():
     mp_drawing = mp.solutions.drawing_utils
 
     sensitivity_factor = 1.5
-    cap = cv2.VideoCapture(0)
+    captura = cv2.VideoCapture(0)
     maos = mp_hands.Hands(max_num_hands=1)
 
     def calcular_distancia(ponto1, ponto2):
         return math.sqrt(((ponto2[0] - ponto1[0]) ** 2) + ((ponto2[1] - ponto1[1]) ** 2))
 
     while True:
-        sucesso, frame = cap.read()
+        sucesso, frame = captura.read()
         if not sucesso:
             continue
 
@@ -58,9 +58,9 @@ def mouse_virtual():
             if clickBtnDireito < 20:
                 pyautogui.click(button='right')
 
-            if n1 > 0 and n2 > 0  and n3 > 0:
+            if n1 > 0 and n2 > 0 and n3 > 0:
                 print(n1, n2, n3)
                 break
 
-    cap.release()
+    captura.release()
     cv2.destroyAllWindows()

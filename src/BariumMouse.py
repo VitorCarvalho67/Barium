@@ -43,7 +43,7 @@ def calcular_distancia(ponto1, ponto2):
 
 modo_mouse = False
 
-cap = cv2.VideoCapture(0)
+captura = cv2.VideoCapture(0)
 mp_maos = mp.solutions.hands
 maos = mp_maos.Hands(max_num_hands=1)
 
@@ -65,7 +65,7 @@ while True:
         for a in range(21):
             coordenadas.append((0, 0))
 
-        sucesso, frame = cap.read()
+        sucesso, frame = captura.read()
         if not sucesso:
             continue
 
@@ -266,7 +266,7 @@ while True:
     previsao = model.predict(video)
     previsao = np.argmax(previsao)
 
-    movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume']
+    movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Abrir o explorador de arquivos']
     
 
     # print(previsao)
@@ -299,6 +299,9 @@ while True:
         new_volume = min(1.0, current_volume + 0.1)
         volume.SetMasterVolumeLevelScalar(new_volume, None)
 
+    elif(movimentos[previsao] == 'Abrir o explorador de arquivos'):
+        print("Mão reta para a esquerda")
+        pyautogui.hotkey('win', 'e')
     else:
         print("Movimento não reconhecido")
 
@@ -307,5 +310,5 @@ while True:
     if input_v == '0':
         exit
 
-        cap.release()
+        captura.release()
         cv2.destroyAllWindows()

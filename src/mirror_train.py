@@ -8,7 +8,7 @@ def texto_array(text):
     x, y = map(int, text.strip('()').split(', '))
     return [x, y]
 
-dataset = "../data/dataset.csv"
+dataset = "../data/bariumData.csv"
 dados = pd.read_csv(dataset)
 
 # mudei aqui
@@ -74,13 +74,23 @@ x_test = x_test.reshape(x_test.shape[0], 20, 21, 2)
 
 model = Sequential()
 
+# Modelo mais simples
+# model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(20, 21, 2)))
+# model.add(MaxPooling2D((2, 2)))
+# model.add(Conv2D(64, (3, 3), activation='relu'))
+# model.add(MaxPooling2D((2, 2)))
+# model.add(Flatten())
+# model.add(Dense(64, activation='relu'))
+# model.add(Dense(quantidade_movimentos, activation='softmax'))
+
+# Modelo mais complexo
 model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(20, 21, 2)))
 model.add(MaxPooling2D((2, 2)))
 model.add(Conv2D(64, (3, 3), activation='relu'))
-model.add(MaxPooling2D((2, 2)))
+model.add(Conv2D(128, (3, 3), activation='relu'))
 model.add(Flatten())
-model.add(Dense(64, activation='relu'))
-model.add(Dense(quantidade_movimentos, activation='softmax')) 
+model.add(Dense(128, activation='relu'))
+model.add(Dense(quantidade_movimentos, activation='softmax'))
 
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 

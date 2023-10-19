@@ -8,7 +8,7 @@ def texto_array(text):
     x, y = map(int, text.strip('()').split(', '))
     return [x, y]
 
-dataset = "../data/dataset.csv"
+dataset = "../data/bariumData.csv"
 dados = pd.read_csv(dataset)
 
 remover = dados.filter(like='referencial', axis=1).columns | dados.filter(like='diagonal', axis=1).columns

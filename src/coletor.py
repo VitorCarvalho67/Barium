@@ -27,7 +27,7 @@ quantidade_de_frames = 20
 
 exibir_conexoes = True
 mostrar_numeros = True
-dataset = "../data/dataset.csv"
+dataset = "../data/bariumData.csv"
 
 def calcular_distancia(ponto1, ponto2):
     return math.sqrt(((ponto2[0] - ponto1[0]) ** 2) + ((ponto2[1] - ponto1[1]) ** 2))

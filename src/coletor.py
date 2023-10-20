@@ -9,10 +9,6 @@ import datetime
 import pytz
 import os
 
-# 0 - TCHAU
-# 1 - ABRIR A MÃO
-# 2- Z
-
 salvar_videos = True
 
 fusoHorario = pytz.timezone('America/Sao_Paulo')
@@ -31,6 +27,15 @@ dataset = "../data/bariumData.csv"
 
 def calcular_distancia(ponto1, ponto2):
     return math.sqrt(((ponto2[0] - ponto1[0]) ** 2) + ((ponto2[1] - ponto1[1]) ** 2))
+
+def aumentar_contraste(frane):
+
+    alpha = 2
+    beta = 0
+
+    imagem = cv2.convertScaleAbs(frame, alpha=alpha, beta=beta)
+
+    return imagem
 
 cap = cv2.VideoCapture(0)
 mp_maos = mp.solutions.hands
@@ -58,7 +63,7 @@ while True:
 
     frame = cv2.flip(frame, 1)
 
-    resultados = maos.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+    resultados = maos.process(cv2.cvtColor(aumentar_contraste(frame), cv2.COLOR_BGR2RGB))
 
     lista_pontos = []
 
@@ -88,7 +93,7 @@ while True:
             if exibir_conexoes:
                 mp.solutions.drawing_utils.draw_landmarks(frame, pontos_mao, mp_maos.HAND_CONNECTIONS)
 
-    cv2.imshow("Câmera", frame)
+    cv2.imshow("Câmera", aumentar_contraste(frame))
 
     if not numero == -1 and iteracao < 20:
         tempo_atual = time.time() * 1000

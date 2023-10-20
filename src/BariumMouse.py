@@ -20,7 +20,8 @@ from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 
-model = load_model("../models/modelMirror.keras")
+model = load_model("../models/modelTest.keras")
+# model = load_model("../models/modelMirror.keras")
 
 salvar_videos = False
 
@@ -38,12 +39,21 @@ exibir_conexoes = True
 mostrar_numeros = True
 dataset = "../data/test.csv"
 
+def aumentar_contraste(frane):
+
+    alpha = 2
+    beta = 0
+
+    imagem = cv2.convertScaleAbs(frame, alpha=alpha, beta=beta)
+
+    return imagem
+
 def calcular_distancia(ponto1, ponto2):
     return math.sqrt(((ponto2[0] - ponto1[0]) ** 2) + ((ponto2[1] - ponto1[1]) ** 2))
 
 modo_mouse = False
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 mp_maos = mp.solutions.hands
 maos = mp_maos.Hands(max_num_hands=1)
 
@@ -71,7 +81,7 @@ while True:
 
         frame = cv2.flip(frame, 1)
 
-        resultados = maos.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+        resultados = maos.process(cv2.cvtColor(aumentar_contraste(frame), cv2.COLOR_BGR2RGB))
 
         lista_pontos = []
 
@@ -101,7 +111,7 @@ while True:
                 if exibir_conexoes:
                     mp.solutions.drawing_utils.draw_landmarks(frame, pontos_mao, mp_maos.HAND_CONNECTIONS)
 
-        cv2.imshow("Câmera", frame)
+        cv2.imshow("Câmera", aumentar_contraste(frame))
 
         if not numero == -1 and iteracao < 20:
             tempo_atual = time.time() * 1000
@@ -264,6 +274,8 @@ while True:
     print(video.shape)
 
     previsao = model.predict(video)
+    print(previsao)
+
     previsao = np.argmax(previsao)
 
     movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Abrir o explorador de arquivos']

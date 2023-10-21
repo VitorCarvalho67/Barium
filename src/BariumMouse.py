@@ -266,9 +266,8 @@ while True:
     previsao = model.predict(video)
     previsao = np.argmax(previsao)
 
-    movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Abrir o explorador de arquivos']
+    movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Abrir o explorador de arquivos', 'Salvar', 'Aumentar o volume', 'Diminuir o volume', 'Aumentar o brilho', 'Diminuir o brilho', 'Ctrl + z' 'Ctrl + y']
     
-
     # print(previsao)
 
     print("Movimento previsto: ", movimentos[previsao])
@@ -288,7 +287,7 @@ while True:
         mouse.mouse_virtual()
             
     elif(movimentos[previsao] == 'Aumentar o volume'):
-        print("para cima")
+        print("estende a mão para cima")
         devices = AudioUtilities.GetSpeakers()
         interface = devices.Activate(
             IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
@@ -297,11 +296,45 @@ while True:
 
         current_volume = volume.GetMasterVolumeLevelScalar()
         new_volume = min(1.0, current_volume + 0.1)
-        volume.SetMasterVolumeLevelScalar(new_volume, None)
+        if new_volume > 100:
+            new_volume = 100
+        else:
+            volume.SetMasterVolumeLevelScalar(new_volume, None)
 
     elif(movimentos[previsao] == 'Abrir o explorador de arquivos'):
         print("Mão reta para a esquerda")
         pyautogui.hotkey('win', 'e')
+
+    elif(movimentos[previsao] == 'Salvar'):
+        print("Mão reta para a direita")
+        pyautogui.hotkey('ctrl', 's')
+
+    elif(movimentos[previsao] == 'Diminuir o volume'):
+        print("dedo indicador para baixo")
+        devices = AudioUtilities.GetSpeakers()
+        interface = devices.Activate(
+            IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+
+        volume = cast(interface, POINTER(IAudioEndpointVolume))
+
+        current_volume = volume.GetMasterVolumeLevelScalar()
+        new_volume = max(0.0, current_volume - 0.1)
+        volume.SetMasterVolumeLevelScalar(new_volume, None)
+    
+    elif(movimentos[previsao] == 'Aumentar o brilho'):
+        print("pinça com os dedos indicador e polegar para cima")
+        
+    elif(movimentos[previsao] == 'Diminuir o brilho'):
+        print("pinça com os dedos indicador e polegar para baixo")
+    
+    elif(movimentos[previsao] == 'Ctrl + z'):
+        print("like para o lado esquerdo")
+        pyautogui.hotkey('ctrl', 'z')
+    
+    elif(movimentos[previsao] == 'Ctrl + y'):
+        print("like para o lado direito")
+        pyautogui.hotkey('ctrl', 'y')
+
     else:
         print("Movimento não reconhecido")
 

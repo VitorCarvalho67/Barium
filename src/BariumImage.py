@@ -288,7 +288,7 @@ while True:
 
     previsao = np.argmax(previsao)
 
-    movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Abrir o explorador de arquivos', 'Salvar', 'Aumentar o volume', 'Diminuir o volume', 'Aumentar o brilho', 'Diminuir o brilho', 'Control + Z', 'Control + Y', 'Confirmar']
+    movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Abrir o explorador de arquivos', 'Salvar', 'Diminuir o volume', 'Aumentar o brilho', 'Diminuir o brilho', 'Control + Z', 'Control + Y', 'Confirmar']
 
     # print(previsao)
 

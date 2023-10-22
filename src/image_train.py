@@ -50,7 +50,7 @@ for video in x:
     videos[count_videos*2] = imagens_espelhadas
     count_videos += 1
 
-saida = np.zeros((videos.shape[0]*2, 20, 100, 100), dtype=int)
+saida = np.zeros((videos.shape[0], 20, 100, 100), dtype=int)
 
 for a in range(x.shape[0]):
     video = videos[a]
@@ -83,8 +83,8 @@ y_encoded = pd.get_dummies(y)
 
 x_train, x_test, y_train, y_test = train_test_split(x, y_encoded, test_size=0.2, random_state=42)
 
-x_train = x_train.reshape(x_train.shape[0], 100, 100, 1)
-x_test = x_test.reshape(x_test.shape[0], 100, 100, 1)
+x_train = x_train.reshape(x_train.shape[0], 100, 100, 20)
+x_test = x_test.reshape(x_test.shape[0], 100, 100, 20)
 
 model = Sequential()
 

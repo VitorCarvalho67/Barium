@@ -60,7 +60,7 @@ for a in range(x.shape[0]):
         imagem = np.full((100, 100), -1, dtype=int)
         for i, [x_c, y_c] in enumerate(coordenadas):
             if 0 <= x_c < 100 and 0 <= y_c < 100:
-                imagem[int(x_c),int(y_c)] = i
+                imagem[int(x_c),int(y_c)] = (1 + i) / 22
         video_imagem[im] = imagem
     saida[a] = video_imagem
 
@@ -83,8 +83,8 @@ y_encoded = pd.get_dummies(y)
 
 x_train, x_test, y_train, y_test = train_test_split(x, y_encoded, test_size=0.2, random_state=42)
 
-x_train = x_train.reshape(x_train.shape[0], 100, 100, 20)
-x_test = x_test.reshape(x_test.shape[0], 100, 100, 20)
+x_train = x_train.reshape(x_train.shape[0], 20, 100, 100)
+x_test = x_test.reshape(x_test.shape[0], 20, 100, 100)
 
 model = Sequential()
 
@@ -100,7 +100,7 @@ model = Sequential()
 # Modelo mais complexo
 model = Sequential()
 
-model.add(Conv3D(32, (3, 3, 3), activation='relu', input_shape=(100, 100, 20, 1)))
+model.add(Conv3D(32, (3, 3, 3), activation='relu', input_shape=(20, 100, 100, 1)))
 model.add(MaxPooling3D((2, 2, 2)))
 
 model.add(Conv3D(64, (3, 3, 3), activation='relu'))
@@ -111,6 +111,7 @@ model.add(Conv3D(64, (3, 3, 3), activation='relu'))
 model.add(Flatten())
 
 model.add(Dense(64, activation='relu'))
+model.add(Dense(64, activation='sigmoid'))
 model.add(Dense(quantidade_movimentos, activation='softmax'))
 
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])

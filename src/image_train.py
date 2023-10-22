@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+from keras.layers import Conv3D, MaxPooling3D, Flatten, Dense
 
 def texto_array(text):
     x, y = map(int, text.strip('()').split(', '))
@@ -100,17 +100,17 @@ model = Sequential()
 # Modelo mais complexo
 model = Sequential()
 
-model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(100, 100, 20)))
-model.add(MaxPooling2D((2, 2)))
+model.add(Conv3D(32, (3, 3, 3), activation='relu', input_shape=(100, 100, 20, 1)))
+model.add(MaxPooling3D((2, 2, 2)))
 
-model.add(Conv2D(64, (3, 3), activation='relu'))
-model.add(MaxPooling2D((2, 2)))
+model.add(Conv3D(64, (3, 3, 3), activation='relu'))
+model.add(MaxPooling3D((2, 2, 2)))
 
-model.add(Conv2D(64, (3, 3), activation='relu'))
+model.add(Conv3D(64, (3, 3, 3), activation='relu'))
 
 model.add(Flatten())
 
-model.add(Dense(256, activation='relu'))
+model.add(Dense(64, activation='relu'))
 model.add(Dense(quantidade_movimentos, activation='softmax'))
 
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])

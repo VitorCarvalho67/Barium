@@ -275,13 +275,13 @@ while True:
         imagem = np.full((100, 100), -1, dtype=int)
         for i, [x_c, y_c] in enumerate(coordenadas):
             if 0 <= x_c < 100 and 0 <= y_c < 100:
-                imagem[int(x_c),int(y_c)] = i
+                imagem[int(x_c),int(y_c)] = (1 + i ) / 22
         video_imagem[im] = imagem
     video = video_imagem
 
-    x = np.array(x).reshape((x.shape[0], 20, 21, 2))
+    x = np.array(x).reshape((x.shape[0], 20, 100, 100))
 
-    video = (x[(x.shape[0]) - 1]).reshape((1, 20, 21, 2))
+    video = (x[(x.shape[0]) - 1]).reshape((1, 20, 100, 100))
 
     print(video.shape)
 

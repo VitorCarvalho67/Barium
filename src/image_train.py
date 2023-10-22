@@ -15,7 +15,7 @@ dados = pd.read_csv(dataset)
 x = dados.loc[:, ~dados.columns.str.contains('referencial|diagonal')].drop(['movimento'], axis=1).values
 # até aqui
 
-videos = np.zeros(((x.shape[0]*2), 20, 21, 2))
+videos = np.zeros((x.shape[0]*2, 20, 21, 2))
 
 count_videos = 0
 
@@ -50,22 +50,21 @@ for video in x:
     videos[count_videos*2] = imagens_espelhadas
     count_videos += 1
 
-x = videos
-
-matrix_of_B2 = np.array((x.shape[0], 20, 100, 100))
+saida = np.zeros((videos.shape[0]*2, 20, 100, 100), dtype=int)
 
 for a in range(x.shape[0]):
-    video = x[a]
-    video_imagem = np.array((100, 100))
-    for A in video:
-        B = np.full((100, 100), -1)
-        for i, [x_c, y_c] in enumerate(A):
+    video = videos[a]
+    video_imagem = np.zeros((20, 100, 100), dtype=int)
+    for im in range(video.shape[0]):
+        coordenadas = video[im]
+        imagem = np.full((100, 100), -1, dtype=int)
+        for i, [x_c, y_c] in enumerate(coordenadas):
             if 0 <= x_c < 100 and 0 <= y_c < 100:
-                B[int(x_c),int(y_c)] = i
-        video_imagem = B
-    matrix_of_B2[a] = video_imagem
+                imagem[int(x_c),int(y_c)] = i
+        video_imagem[im] = imagem
+    saida[a] = video_imagem
 
-x = np.array(matrix_of_B2)
+x = np.array(saida)
 
 y = dados['movimento']
 
@@ -101,7 +100,7 @@ model = Sequential()
 # Modelo mais complexo
 model = Sequential()
 
-model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(20, 100, 100, 1)))
+model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(100, 100, 20)))
 model.add(MaxPooling2D((2, 2)))
 
 model.add(Conv2D(64, (3, 3), activation='relu'))

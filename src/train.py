@@ -8,11 +8,15 @@ def texto_array(text):
     x, y = map(int, text.strip('()').split(', '))
     return [x, y]
 
+<<<<<<< HEAD
 bariumData = "../data/bariumData.csv"
 dados = pd.read_csv(bariumData)
+=======
+dataset = "../data/bariumDataCd.csv"
+dados = pd.read_csv(dataset)
+>>>>>>> c88a2d8e73bfb1b611b8d358d0c754279a24f391
 
-remover = dados.filter(like='referencial', axis=1).columns | dados.filter(like='diagonal', axis=1).columns
-x = dados.drop(columns=remover).drop(['movimento'], axis=1)
+x = dados.loc[:, ~dados.columns.str.contains('referencial|diagonal')].drop(['movimento'], axis=1).values
 
 x = np.array(x)
 
@@ -75,4 +79,4 @@ model.fit(x_train, y_train, epochs=10, batch_size=32, validation_data=(x_test, y
 loss, accuracy = model.evaluate(x_test, y_test)
 print(f"Acurácia do modelo: {accuracy*100:.2f}%")
 
-model.save("../models/modelTest.keras")
+model.save("../models/modelTest1.keras")

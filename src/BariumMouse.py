@@ -278,13 +278,8 @@ while True:
 
     previsao = np.argmax(previsao)
 
-<<<<<<< HEAD
     movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Abrir o explorador de arquivos', 'Salvar', 'Aumentar o volume', 'Diminuir o volume', 'Aumentar o brilho', 'Diminuir o brilho', 'Ctrl + z' 'Ctrl + y']
     
-=======
-    movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Abrir o explorador de arquivos', 'Salvar', 'Aumentar o volume', 'Diminuir o volume', 'Aumentar o brilho', 'Diminuir o brilho', 'Control + Z', 'Control + Y', 'Confirmar']
-
->>>>>>> c88a2d8e73bfb1b611b8d358d0c754279a24f391
     # print(previsao)
 
     print("Movimento previsto: ", movimentos[previsao])
@@ -314,18 +309,13 @@ while True:
         current_volume = volume.GetMasterVolumeLevelScalar()
         new_volume = min(1.0, current_volume + 0.1)
         if new_volume > 100:
-<<<<<<< HEAD
             new_volume = 100
-=======
-            volume.SetMasterVolumeLevelScalar(100, None)
->>>>>>> c88a2d8e73bfb1b611b8d358d0c754279a24f391
         else:
             volume.SetMasterVolumeLevelScalar(new_volume, None)
 
     elif(movimentos[previsao] == 'Abrir o explorador de arquivos'):
         print("Mão reta para a esquerda")
         pyautogui.hotkey('win', 'e')
-<<<<<<< HEAD
 
     elif(movimentos[previsao] == 'Salvar'):
         print("Mão reta para a direita")
@@ -336,19 +326,10 @@ while True:
         devices = AudioUtilities.GetSpeakers()
         interface = devices.Activate(
             IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-=======
-    
-    elif(movimentos[previsao] == 'Salvar'):
-        pyautogui.hotkey('win', 's')
-    elif(movimentos[previsao] == 'Diminuir o volume'):
-        devices = AudioUtilities.GetSpeakers()
-        interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
->>>>>>> c88a2d8e73bfb1b611b8d358d0c754279a24f391
 
         volume = cast(interface, POINTER(IAudioEndpointVolume))
 
         current_volume = volume.GetMasterVolumeLevelScalar()
-<<<<<<< HEAD
         new_volume = max(0.0, current_volume - 0.1)
         volume.SetMasterVolumeLevelScalar(new_volume, None)
     
@@ -366,15 +347,6 @@ while True:
         print("like para o lado direito")
         pyautogui.hotkey('ctrl', 'y')
 
-=======
-        new_volume = min(1.0, current_volume - 0.1)
-        if new_volume < 0:
-            volume.SetMasterVolumeLevelScalar(0, None)
-        else:
-            volume.SetMasterVolumeLevelScalar(new_volume, None)
-    elif(movimentos[previsao] == 'Diminuir o volume'):
-        print("Confirmar")
->>>>>>> c88a2d8e73bfb1b611b8d358d0c754279a24f391
     else:
         print("Movimento não reconhecido")
 

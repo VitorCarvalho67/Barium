@@ -52,20 +52,20 @@ for video in x:
 
 x = videos
 
-matrix_of_B2 = []
+matrix_of_B2 = np.array((x.shape[0], 20, 100, 100))
 
-for video in x:
-    list_of_B = []
+for a in range(x.shape[0]):
+    video = x[a]
+    video_imagem = np.array((100, 100))
     for A in video:
         B = np.full((100, 100), -1)
         for i, [x_c, y_c] in enumerate(A):
             if 0 <= x_c < 100 and 0 <= y_c < 100:
-                print([x_c, y_c])
-                B[x_c][y_c] = i
-        list_of_B.append(B)
-    matrix_of_B2.append(list_of_B)
+                B[int(x_c),int(y_c)] = i
+        video_imagem = B
+    matrix_of_B2[a] = video_imagem
 
-x = matrix_of_B2
+x = np.array(matrix_of_B2)
 
 y = dados['movimento']
 

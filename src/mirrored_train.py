@@ -8,7 +8,7 @@ def texto_array(text):
     x, y = map(int, text.strip('()').split(', '))
     return [x, y]
 
-dataset = "../data/bariumData.csv"
+dataset = "../data/bariumDataCd.csv"
 dados = pd.read_csv(dataset)
 
 # mudei aqui

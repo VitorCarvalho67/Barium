@@ -20,7 +20,7 @@ from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 
-model = load_model("../models/modelMirror.keras")
+model = load_model("../models/modelImage2.keras")
 # model = load_model("../models/modelMirror.keras")
 
 salvar_videos = False
@@ -265,23 +265,21 @@ while True:
         videos[count_videos] = imagens
         count_videos += 1
 
-    x = videos
+    saida = np.zeros((videos.shape[0], 20, 100, 100), dtype=int)
 
+    for a in range(x.shape[0]):
+        video = videos[a]
+        video_imagem = np.zeros((20, 100, 100), dtype=int)
+        for im in range(video.shape[0]):
+            coordenadas = video[im]
+            imagem = np.full((100, 100), -1, dtype=int)
+            for i, [x_c, y_c] in enumerate(coordenadas):
+                if 0 <= x_c < 100 and 0 <= y_c < 100:
+                    imagem[int(x_c),int(y_c)] = (1 + i) / 22
+            video_imagem[im] = imagem
+        saida[a] = video_imagem
 
-    video = x[0]
-    video_imagem = np.zeros((20, 100, 100), dtype=int)
-    for im in range(video.shape[0]):
-        coordenadas = video[im]
-        imagem = np.full((100, 100), -1, dtype=int)
-        for i, [x_c, y_c] in enumerate(coordenadas):
-            if 0 <= x_c < 100 and 0 <= y_c < 100:
-                imagem[int(x_c),int(y_c)] = (1 + i ) / 22
-        video_imagem[im] = imagem
-    video = video_imagem
-
-    x = np.array(x).reshape((x.shape[0], 20, 100, 100))
-
-    video = (x[(x.shape[0]) - 1]).reshape((1, 20, 100, 100))
+    video = (saida[(saida.shape[0]) - 1]).reshape((1, 20, 100, 100))
 
     print(video.shape)
 

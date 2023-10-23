@@ -1,6 +1,6 @@
 import sys
 import os
-projeto_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+projeto_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
 sys.path.append(projeto_dir)
 
 from modules import mouse
@@ -20,8 +20,7 @@ from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 
-model = load_model("../models/modelMirror.keras")
-# model = load_model("../models/modelMirror.keras")
+model = load_model("../../models/modelTest.keras")
 
 salvar_videos = False
 
@@ -37,7 +36,7 @@ quantidade_de_frames = 20
 
 exibir_conexoes = True
 mostrar_numeros = True
-dataset = "../data/test.csv"
+dataset = "../../data/test.csv"
 
 def aumentar_contraste(frane):
 
@@ -80,6 +79,8 @@ while True:
             continue
 
         frame = cv2.flip(frame, 1)
+        
+        cv2.imshow("Câmera", aumentar_contraste(frame))
 
         resultados = maos.process(cv2.cvtColor(aumentar_contraste(frame), cv2.COLOR_BGR2RGB))
 
@@ -111,7 +112,6 @@ while True:
                 if exibir_conexoes:
                     mp.solutions.drawing_utils.draw_landmarks(frame, pontos_mao, mp_maos.HAND_CONNECTIONS)
 
-        cv2.imshow("Câmera", aumentar_contraste(frame))
 
         if not numero == -1 and iteracao < 20:
             tempo_atual = time.time() * 1000
@@ -202,7 +202,7 @@ while True:
         if iteracao == -1:
             iteracao = 0
             break
-
+   
     file = dataset
 
     dados_tratados = []
@@ -267,18 +267,18 @@ while True:
 
     x = videos
 
-    x = np.array(x).reshape((x.shape[0], 20, 21, 2))
+    x = np.array(x).reshape((x.shape[0], 840))
 
-    video = (x[(x.shape[0]) - 1]).reshape((1, 20, 21, 2))
+    video = (x[(x.shape[0]) - 1]).reshape((1, 840))
 
     print(video.shape)
 
-    previsao = model.predict(video)
+    previsao = model.predict(video.reshape(1, -1))
     print(previsao)
 
     previsao = np.argmax(previsao)
 
-    movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Abrir o explorador de arquivos', 'Salvar', 'Aumentar o volume', 'Diminuir o volume', 'Aumentar o brilho', 'Diminuir o brilho', 'Control + Z', 'Control + Y', 'Confirmar']
+    movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Salvar', 'Abrir o explorador de arquivos', 'Diminuir o volume', 'Aumentar o brilho', 'Diminuir o brilho', 'Control + Z', 'Control + Y', 'Confirmar']
 
     # print(previsao)
 

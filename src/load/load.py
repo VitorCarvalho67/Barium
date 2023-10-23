@@ -11,7 +11,7 @@ import os
 import pandas as pd
 from keras.models import load_model
 
-model = load_model("../models/modelMirror.keras")
+model = load_model("../../models/modelMirror.keras")
 
 salvar_videos = False
 
@@ -27,7 +27,7 @@ quantidade_de_frames = 20
 
 exibir_conexoes = True
 mostrar_numeros = True
-dataset = "../data/test.csv"
+dataset = "../../data/test.csv"
 
 def calcular_distancia(ponto1, ponto2):
     return math.sqrt(((ponto2[0] - ponto1[0]) ** 2) + ((ponto2[1] - ponto1[1]) ** 2))

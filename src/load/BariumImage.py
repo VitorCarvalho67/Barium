@@ -1,6 +1,6 @@
 import sys
 import os
-projeto_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+projeto_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
 sys.path.append(projeto_dir)
 
 from modules import mouse
@@ -20,7 +20,7 @@ from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 
-model = load_model("../models/modelImage2.keras")
+model = load_model("../../models/modelImage2.keras")
 # model = load_model("../models/modelMirror.keras")
 
 salvar_videos = False
@@ -29,7 +29,7 @@ fusoHorario = pytz.timezone('America/Sao_Paulo')
 dia_atual = (datetime.datetime.now(fusoHorario)).strftime('%Y-%m-%d %H-%M-%S')
 
 if salvar_videos:
-    diretorio = f"../video/video_{dia_atual}"
+    diretorio = f"../../video/video_{dia_atual}"
     os.makedirs(diretorio)
 
 intervalo = 100
@@ -37,7 +37,7 @@ quantidade_de_frames = 20
 
 exibir_conexoes = True
 mostrar_numeros = True
-dataset = "../data/test.csv"
+dataset = "../../data/test.csv"
 
 def aumentar_contraste(frane):
 
@@ -223,7 +223,7 @@ while True:
         x, y = map(int, text.strip('()').split(', '))
         return [x, y]
 
-    dataset = "../data/test.csv"
+    dataset = "../../data/test.csv"
     dados = pd.read_csv(dataset)
 
     # Mudei aqui

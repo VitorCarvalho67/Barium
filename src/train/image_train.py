@@ -8,7 +8,7 @@ def texto_array(text):
     x, y = map(int, text.strip('()').split(', '))
     return [x, y]
 
-dataset = "../data/bariumDataCd.csv"
+dataset = "../../data/bariumDataCd.csv"
 dados = pd.read_csv(dataset)
 
 # mudei aqui
@@ -121,4 +121,8 @@ model.fit(x_train, y_train, epochs=30, batch_size=32, validation_data=(x_test, y
 loss, accuracy = model.evaluate(x_test, y_test)
 print(f"Acurácia do modelo: {accuracy*100:.2f}%")
 
+<<<<<<< HEAD:src/image_train.py
 model.save("../models/modelImage30.keras")
+=======
+model.save("../../models/modelImage2.keras")
+>>>>>>> 04741c0932307448b06ecac0afb66edb597f924b:src/train/image_train.py

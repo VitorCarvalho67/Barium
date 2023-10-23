@@ -1,6 +1,6 @@
 import sys
 import os
-projeto_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+projeto_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
 sys.path.append(projeto_dir)
 
 from modules import mouse
@@ -20,8 +20,7 @@ from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 
-model = load_model("../models/modelMirror.keras")
-# model = load_model("../models/modelMirror.keras")
+model = load_model("../../models/modelTest.keras")
 
 salvar_videos = False
 
@@ -37,7 +36,7 @@ quantidade_de_frames = 20
 
 exibir_conexoes = True
 mostrar_numeros = True
-dataset = "../data/test.csv"
+dataset = "../../data/test.csv"
 
 def aumentar_contraste(frane):
 
@@ -80,6 +79,8 @@ while True:
             continue
 
         frame = cv2.flip(frame, 1)
+        
+        cv2.imshow("Câmera", aumentar_contraste(frame))
 
         resultados = maos.process(cv2.cvtColor(aumentar_contraste(frame), cv2.COLOR_BGR2RGB))
 
@@ -111,7 +112,6 @@ while True:
                 if exibir_conexoes:
                     mp.solutions.drawing_utils.draw_landmarks(frame, pontos_mao, mp_maos.HAND_CONNECTIONS)
 
-        cv2.imshow("Câmera", aumentar_contraste(frame))
 
         if not numero == -1 and iteracao < 20:
             tempo_atual = time.time() * 1000
@@ -202,7 +202,7 @@ while True:
         if iteracao == -1:
             iteracao = 0
             break
-
+   
     file = dataset
 
     dados_tratados = []
@@ -267,19 +267,19 @@ while True:
 
     x = videos
 
-    x = np.array(x).reshape((x.shape[0], 20, 21, 2))
+    x = np.array(x).reshape((x.shape[0], 840))
 
-    video = (x[(x.shape[0]) - 1]).reshape((1, 20, 21, 2))
+    video = (x[(x.shape[0]) - 1]).reshape((1, 840))
 
     print(video.shape)
 
-    previsao = model.predict(video)
+    previsao = model.predict(video.reshape(1, -1))
     print(previsao)
 
     previsao = np.argmax(previsao)
 
-    movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Abrir o explorador de arquivos', 'Salvar', 'Aumentar o volume', 'Diminuir o volume', 'Aumentar o brilho', 'Diminuir o brilho', 'Ctrl + z' 'Ctrl + y']
-    
+    movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Salvar', 'Abrir o explorador de arquivos', 'Diminuir o volume', 'Aumentar o brilho', 'Diminuir o brilho', 'Control + Z', 'Control + Y', 'Confirmar']
+
     # print(previsao)
 
     print("Movimento previsto: ", movimentos[previsao])
@@ -299,7 +299,7 @@ while True:
         # mouse.mouse_virtual()
             
     elif(movimentos[previsao] == 'Aumentar o volume'):
-        print("estende a mão para cima")
+        print("para cima")
         devices = AudioUtilities.GetSpeakers()
         interface = devices.Activate(
             IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
@@ -309,44 +309,30 @@ while True:
         current_volume = volume.GetMasterVolumeLevelScalar()
         new_volume = min(1.0, current_volume + 0.1)
         if new_volume > 100:
-            new_volume = 100
+            volume.SetMasterVolumeLevelScalar(100, None)
         else:
             volume.SetMasterVolumeLevelScalar(new_volume, None)
 
     elif(movimentos[previsao] == 'Abrir o explorador de arquivos'):
         print("Mão reta para a esquerda")
         pyautogui.hotkey('win', 'e')
-
+    
     elif(movimentos[previsao] == 'Salvar'):
-        print("Mão reta para a direita")
-        pyautogui.hotkey('ctrl', 's')
-
+        pyautogui.hotkey('win', 's')
     elif(movimentos[previsao] == 'Diminuir o volume'):
-        print("dedo indicador para baixo")
         devices = AudioUtilities.GetSpeakers()
-        interface = devices.Activate(
-            IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+        interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
 
         volume = cast(interface, POINTER(IAudioEndpointVolume))
 
         current_volume = volume.GetMasterVolumeLevelScalar()
-        new_volume = max(0.0, current_volume - 0.1)
-        volume.SetMasterVolumeLevelScalar(new_volume, None)
-    
-    elif(movimentos[previsao] == 'Aumentar o brilho'):
-        print("pinça com os dedos indicador e polegar para cima")
-        
-    elif(movimentos[previsao] == 'Diminuir o brilho'):
-        print("pinça com os dedos indicador e polegar para baixo")
-    
-    elif(movimentos[previsao] == 'Ctrl + z'):
-        print("like para o lado esquerdo")
-        pyautogui.hotkey('ctrl', 'z')
-    
-    elif(movimentos[previsao] == 'Ctrl + y'):
-        print("like para o lado direito")
-        pyautogui.hotkey('ctrl', 'y')
-
+        new_volume = min(1.0, current_volume - 0.1)
+        if new_volume < 0:
+            volume.SetMasterVolumeLevelScalar(0, None)
+        else:
+            volume.SetMasterVolumeLevelScalar(new_volume, None)
+    elif(movimentos[previsao] == 'Diminuir o volume'):
+        print("Confirmar")
     else:
         print("Movimento não reconhecido")
 

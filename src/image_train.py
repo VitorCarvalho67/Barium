@@ -111,7 +111,7 @@ model.add(Conv3D(64, (3, 3, 3), activation='relu'))
 model.add(Flatten())
 
 model.add(Dense(64, activation='relu'))
-model.add(Dense(64, activation=''))
+model.add(Dense(64, activation='sigmoid'))
 model.add(Dense(quantidade_movimentos, activation='softmax'))
 
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])

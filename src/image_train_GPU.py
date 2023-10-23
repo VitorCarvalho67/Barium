@@ -131,4 +131,4 @@ model.fit(x_train, y_train, epochs=30, batch_size=32, validation_data=(x_test, y
 loss, accuracy = model.evaluate(x_test, y_test)
 print(f"Acurácia do modelo: {accuracy*100:.2f}%")
 
-model.save("../models/modelImage30.keras")
+model.save("../models/modelImage31.keras")

@@ -168,7 +168,7 @@ while True:
                 for coluna in range(matriz.shape[1]):
                     elemento = matriz[coluna, linha]
                     if elemento != -1:
-                        coordenadas[elemento] = ((linha, coluna))
+                        coordenadas[elemento] = ([linha, coluna])
 
             foto = Image.new("RGB", (100, 100), "black")
 
@@ -190,11 +190,11 @@ while True:
 
             linha = []
 
-            for (x, y) in coordenadas:
-                linha.append(str((x, y)))
+            for [x, y] in coordenadas:
+                linha.append([x, y])
             
-            linha.append(referencial)
-            linha.append(diagonal)
+            # linha.append(referencial)
+            # linha.append(diagonal)
 
             matrizes.append(linha)
 
@@ -202,157 +202,84 @@ while True:
             iteracao = 0
             break
 
-    file = dataset
-
-    dados_tratados = []
-
-    for linha in dados:
-        linha = [item for sublista in linha for item in sublista]
-
-        dados_tratados.append(linha)
-
-    with open(file, mode='a', newline='') as arquivo:
-        escrever = csv.writer(arquivo, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-
-        for linha in dados_tratados:
-            escrever.writerow(linha)
+    video = np.array(dados)
 
 
-    def texto_array(text):
-        x, y = map(int, text.strip('()').split(', '))
-        return [x, y]
+    previsoes = model.predict(video)
 
-    dataset = "../../data/test.csv"
-    dados = pd.read_csv(dataset)
-
-    # Mudei aqui
-    colunas_referencial = dados.filter(like='referencial', axis=1).columns
-    colunas_diagonal = dados.filter(like='diagonal', axis=1).columns
-
-    colunas_para_remover = colunas_referencial.union(colunas_diagonal)
-    x = dados.drop(columns=colunas_para_remover)
-    # Até aqui
-
-    x = np.array(x)
-
-    videos = np.zeros((x.shape[0], 20, 21, 2))
-
-    count_videos = 0
-
-    for video in x:
-
-        count_coord = 0
-        count_img = 0
-
-        imagens = np.zeros((20, 21, 2))
-
-        imagem = np.zeros((21, 2))
-        for coordenada in video:
-
-            array = texto_array(coordenada)
-            imagem[count_coord][0], imagem[count_coord][1] = array[0], array[1] 
-            
-            if count_coord <= 19:
-                count_coord += 1
-
-            else:
-                imagens[count_img] = imagem
-                imagem = np.zeros((21, 2))
-                count_img += 1
-                count_coord = 0
-                
-        videos[count_videos] = imagens
-        count_videos += 1
-
-    x = videos
-
-    x = np.array(x).reshape((x.shape[0], 20, 21, 2))
-
-    video = (x[(x.shape[0]) - 1]).reshape((1, 20, 21, 2))
-
-    print(video.shape)
-
-    previsao = model.predict(video)
-    print(previsao)
-
-    previsao = np.argmax(previsao)
-
-<<<<<<< HEAD:src/BariumMouse.py
-    movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Abrir o explorador de arquivos', 'Salvar', 'Aumentar o volume', 'Diminuir o volume', 'Aumentar o brilho', 'Diminuir o brilho', 'Ctrl + z' 'Ctrl + y']
-    
-=======
     movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Salvar', 'Abrir o explorador de arquivos', 'Diminuir o volume', 'Aumentar o brilho', 'Diminuir o brilho', 'Control + Z', 'Control + Y', 'Confirmar']
 
->>>>>>> 04741c0932307448b06ecac0afb66edb597f924b:src/load/BariumMouse.py
-    # print(previsao)
+    for i, probabilidade in enumerate(np.array(previsoes)[0]):
+        print(f'{movimentos[i]}: {probabilidade * 100:.2f}%')
+    
+    previsao = np.argmax(previsoes)
+    print("\nMovimento previsto com maior certeza: ", movimentos[previsao])
 
-    print("Movimento previsto: ", movimentos[previsao])
+    # if (movimentos[previsao] == 'Fechar Telas'):
+    #     print("tchau")
+    #     pyautogui.hotkey('win', 'd')
 
-    if (movimentos[previsao] == 'Fechar Telas'):
-        print("tchau")
-        pyautogui.hotkey('win', 'd')
+    # elif(movimentos[previsao] == 'Print screen'):
+    #     print("abrir a mão")
+    #     pyautogui.hotkey('win', 'prtsc')
+    #     pyautogui.hotkey('ctrl', 'a')
+    #     pyautogui.hotkey('ctrl', 'c')
 
-    elif(movimentos[previsao] == 'Print screen'):
-        print("abrir a mão")
-        pyautogui.hotkey('win', 'prtsc')
-        pyautogui.hotkey('ctrl', 'a')
-        pyautogui.hotkey('ctrl', 'c')
-
-    elif(movimentos[previsao] == 'Ativar modo mouse virtual'):
-        print("Mouse Virtual")
-        # mouse.mouse_virtual()
+    # elif(movimentos[previsao] == 'Ativar modo mouse virtual'):
+    #     print("Mouse Virtual")
+    #     # mouse.mouse_virtual()
             
-    elif(movimentos[previsao] == 'Aumentar o volume'):
-        print("estende a mão para cima")
-        devices = AudioUtilities.GetSpeakers()
-        interface = devices.Activate(
-            IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+    # elif(movimentos[previsao] == 'Aumentar o volume'):
+    #     print("estende a mão para cima")
+    #     devices = AudioUtilities.GetSpeakers()
+    #     interface = devices.Activate(
+    #         IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
 
-        volume = cast(interface, POINTER(IAudioEndpointVolume))
+    #     volume = cast(interface, POINTER(IAudioEndpointVolume))
 
-        current_volume = volume.GetMasterVolumeLevelScalar()
-        new_volume = min(1.0, current_volume + 0.1)
-        if new_volume > 100:
-            new_volume = 100
-        else:
-            volume.SetMasterVolumeLevelScalar(new_volume, None)
+    #     current_volume = volume.GetMasterVolumeLevelScalar()
+    #     new_volume = min(1.0, current_volume + 0.1)
+    #     if new_volume > 100:
+    #         new_volume = 100
+    #     else:
+    #         volume.SetMasterVolumeLevelScalar(new_volume, None)
 
-    elif(movimentos[previsao] == 'Abrir o explorador de arquivos'):
-        print("Mão reta para a esquerda")
-        pyautogui.hotkey('win', 'e')
+    # elif(movimentos[previsao] == 'Abrir o explorador de arquivos'):
+    #     print("Mão reta para a esquerda")
+    #     pyautogui.hotkey('win', 'e')
 
-    elif(movimentos[previsao] == 'Salvar'):
-        print("Mão reta para a direita")
-        pyautogui.hotkey('ctrl', 's')
+    # elif(movimentos[previsao] == 'Salvar'):
+    #     print("Mão reta para a direita")
+    #     pyautogui.hotkey('ctrl', 's')
 
-    elif(movimentos[previsao] == 'Diminuir o volume'):
-        print("dedo indicador para baixo")
-        devices = AudioUtilities.GetSpeakers()
-        interface = devices.Activate(
-            IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+    # elif(movimentos[previsao] == 'Diminuir o volume'):
+    #     print("dedo indicador para baixo")
+    #     devices = AudioUtilities.GetSpeakers()
+    #     interface = devices.Activate(
+    #         IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
 
-        volume = cast(interface, POINTER(IAudioEndpointVolume))
+    #     volume = cast(interface, POINTER(IAudioEndpointVolume))
 
-        current_volume = volume.GetMasterVolumeLevelScalar()
-        new_volume = max(0.0, current_volume - 0.1)
-        volume.SetMasterVolumeLevelScalar(new_volume, None)
+    #     current_volume = volume.GetMasterVolumeLevelScalar()
+    #     new_volume = max(0.0, current_volume - 0.1)
+    #     volume.SetMasterVolumeLevelScalar(new_volume, None)
     
-    elif(movimentos[previsao] == 'Aumentar o brilho'):
-        print("pinça com os dedos indicador e polegar para cima")
+    # elif(movimentos[previsao] == 'Aumentar o brilho'):
+    #     print("pinça com os dedos indicador e polegar para cima")
         
-    elif(movimentos[previsao] == 'Diminuir o brilho'):
-        print("pinça com os dedos indicador e polegar para baixo")
+    # elif(movimentos[previsao] == 'Diminuir o brilho'):
+    #     print("pinça com os dedos indicador e polegar para baixo")
     
-    elif(movimentos[previsao] == 'Ctrl + z'):
-        print("like para o lado esquerdo")
-        pyautogui.hotkey('ctrl', 'z')
+    # elif(movimentos[previsao] == 'Ctrl + z'):
+    #     print("like para o lado esquerdo")
+    #     pyautogui.hotkey('ctrl', 'z')
     
-    elif(movimentos[previsao] == 'Ctrl + y'):
-        print("like para o lado direito")
-        pyautogui.hotkey('ctrl', 'y')
+    # elif(movimentos[previsao] == 'Ctrl + y'):
+    #     print("like para o lado direito")
+    #     pyautogui.hotkey('ctrl', 'y')
 
-    else:
-        print("Movimento não reconhecido")
+    # else:
+    #     print("Movimento não reconhecido")
 
     input_v = 1
 

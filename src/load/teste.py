@@ -20,7 +20,7 @@ from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 
-model = load_model("../../models/modelImage2.keras")
+model = load_model("../../models/modelTest.keras")
 
 salvar_videos = False
 
@@ -28,7 +28,7 @@ fusoHorario = pytz.timezone('America/Sao_Paulo')
 dia_atual = (datetime.datetime.now(fusoHorario)).strftime('%Y-%m-%d %H-%M-%S')
 
 if salvar_videos:
-    diretorio = f"../../video/video_{dia_atual}"
+    diretorio = f"../video/video_{dia_atual}"
     os.makedirs(diretorio)
 
 intervalo = 100
@@ -38,7 +38,7 @@ exibir_conexoes = True
 mostrar_numeros = True
 dataset = "../../data/test.csv"
 
-def aumentar_contraste(frane):
+def aumentar_contraste(frame):
 
     alpha = 2
     beta = 0
@@ -72,13 +72,15 @@ while True:
     while True:
         coordenadas = []
         for a in range(21):
-            coordenadas.append((0, 0))
+            coordenadas.append([0, 0])
 
         sucesso, frame = cap.read()
         if not sucesso:
             continue
 
         frame = cv2.flip(frame, 1)
+        
+        cv2.imshow("Câmera", aumentar_contraste(frame))
 
         resultados = maos.process(cv2.cvtColor(aumentar_contraste(frame), cv2.COLOR_BGR2RGB))
 
@@ -110,7 +112,6 @@ while True:
                 if exibir_conexoes:
                     mp.solutions.drawing_utils.draw_landmarks(frame, pontos_mao, mp_maos.HAND_CONNECTIONS)
 
-        cv2.imshow("Câmera", aumentar_contraste(frame))
 
         if not numero == -1 and iteracao < 20:
             tempo_atual = time.time() * 1000
@@ -168,7 +169,7 @@ while True:
                 for coluna in range(matriz.shape[1]):
                     elemento = matriz[coluna, linha]
                     if elemento != -1:
-                        coordenadas[elemento] = ((linha, coluna))
+                        coordenadas[elemento] = [linha, coluna]
 
             foto = Image.new("RGB", (100, 100), "black")
 
@@ -190,11 +191,11 @@ while True:
 
             linha = []
 
-            for (x, y) in coordenadas:
-                linha.append(str((x, y)))
+            for [x, y] in coordenadas:
+                linha.append([x, y])
             
-            linha.append(referencial)
-            linha.append(diagonal)
+            # linha.append(referencial)
+            # linha.append(diagonal)
 
             matrizes.append(linha)
 
@@ -202,93 +203,20 @@ while True:
             iteracao = 0
             break
 
-    file = dataset
+    dados = np.array(dados)
 
-    dados_tratados = []
+    video = (dados).reshape((1, 840))
 
-    for linha in dados:
-        linha = [item for sublista in linha for item in sublista]
+    previsao = model.predict(video.reshape(1, -1))
+    print(previsao)
 
-        dados_tratados.append(linha)
-
-    with open(file, mode='a', newline='') as arquivo:
-        escrever = csv.writer(arquivo, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-
-        for linha in dados_tratados:
-            escrever.writerow(linha)
-
-
-    def texto_array(text):
-        x, y = map(int, text.strip('()').split(', '))
-        return [x, y]
-
-    dataset = "../../data/test.csv"
-    dados = pd.read_csv(dataset)
-
-    # Mudei aqui
-    colunas_referencial = dados.filter(like='referencial', axis=1).columns
-    colunas_diagonal = dados.filter(like='diagonal', axis=1).columns
-
-    colunas_para_remover = colunas_referencial.union(colunas_diagonal)
-    x = dados.drop(columns=colunas_para_remover)
-    # Até aqui
-
-    x = np.array(x)
-
-    videos = np.zeros((x.shape[0], 20, 21, 2))
-
-    count_videos = 0
-
-    for video in x:
-
-        count_coord = 0
-        count_img = 0
-
-        imagens = np.zeros((20, 21, 2))
-
-        imagem = np.zeros((21, 2))
-        for coordenada in video:
-
-            array = texto_array(coordenada)
-            imagem[count_coord][0], imagem[count_coord][1] = array[0], array[1] 
-            
-            if count_coord <= 19:
-                count_coord += 1
-
-            else:
-                imagens[count_img] = imagem
-                imagem = np.zeros((21, 2))
-                count_img += 1
-                count_coord = 0
-                
-        videos[count_videos] = imagens
-        count_videos += 1
-
-    saida = np.zeros((videos.shape[0], 20, 100, 100), dtype=int)
-
-    for a in range(x.shape[0]):
-        video = videos[a]
-        video_imagem = np.zeros((20, 100, 100), dtype=int)
-        for im in range(video.shape[0]):
-            coordenadas = video[im]
-            imagem = np.full((100, 100), -1, dtype=int)
-            for i, [x_c, y_c] in enumerate(coordenadas):
-                if 0 <= x_c < 100 and 0 <= y_c < 100:
-                    imagem[int(x_c),int(y_c)] = (1 + i) / 22
-            video_imagem[im] = imagem
-        saida[a] = video_imagem
-
-    video = (saida[(saida.shape[0]) - 1]).reshape((1, 20, 100, 100))
-
-    previsoes = model.predict(video)
+    previsao = np.argmax(previsao)
 
     movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Salvar', 'Abrir o explorador de arquivos', 'Diminuir o volume', 'Aumentar o brilho', 'Diminuir o brilho', 'Control + Z', 'Control + Y', 'Confirmar']
 
-    for i, probabilidade in enumerate(np.array(previsoes)[0]):
-        print(f'{movimentos[i]}: {probabilidade * 100:.2f}%')
-    
-    previsao = np.argmax(previsoes)
-    print("\nMovimento previsto com maior certeza: ", movimentos[previsao])
+    # print(previsao)
+
+    print("Movimento previsto: ", movimentos[previsao])
 
     # if (movimentos[previsao] == 'Fechar Telas'):
     #     print("tchau")

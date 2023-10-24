@@ -8,13 +8,8 @@ def texto_array(text):
     x, y = map(int, text.strip('()').split(', '))
     return [x, y]
 
-<<<<<<< HEAD:src/train.py
-bariumData = "../data/bariumData.csv"
-dados = pd.read_csv(bariumData)
-=======
 dataset = "../../data/bariumDataCd.csv"
 dados = pd.read_csv(dataset)
->>>>>>> 04741c0932307448b06ecac0afb66edb597f924b:src/train/train.py
 
 x = dados.loc[:, ~dados.columns.str.contains('referencial|diagonal')].drop(['movimento'], axis=1).values
 

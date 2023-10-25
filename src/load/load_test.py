@@ -80,7 +80,6 @@ while True:
 
         frame = cv2.flip(frame, 1)
         
-        cv2.imshow("Câmera", aumentar_contraste(frame))
 
         resultados = maos.process(cv2.cvtColor(aumentar_contraste(frame), cv2.COLOR_BGR2RGB))
 
@@ -199,6 +198,8 @@ while True:
 
             matrizes.append(linha)
 
+        cv2.imshow("Câmera", aumentar_contraste(frame))
+
         if iteracao == -1:
             iteracao = 0
             break
@@ -211,9 +212,44 @@ while True:
 
     movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Salvar', 'Abrir o explorador de arquivos', 'Diminuir o volume', 'Aumentar o brilho', 'Diminuir o brilho', 'Control + Z', 'Control + Y', 'Confirmar']
 
-    for i, probabilidade in enumerate(np.array(previsoes)[0]):
-        print(f'{movimentos[i]}: {probabilidade * 100:.2f}%')
+    max_move = max(len(x) for x in movimentos)
+
+    previsoes_tratadas = []
+
+    maior = 0
+
+    for i, previsao in enumerate(previsoes[0]):
+        if previsao > previsoes[0][maior]:
+            maior = i
+
+        previsoes_tratadas.append(f"{previsao * 100:.2f}%")
+
     
+    max_pred = max(len(x) for x in previsoes_tratadas)
+
+    # for i, previsao in enumerate(previsoes_tratadas):
+    #     print( "+" + "-" * (max_move + 2) + "+" + "-" * (max_pred + 2) + "+")
+    #     print(f"| {movimentos[i]}" + " " * (max_move - len(movimentos[i]) + 1) + "|" + f" {previsao}" + " " *  (max_pred - len(previsao) + 1) + "|")
+
+    # print( "+" + "-" * (max_move + 2) + "+" + "-" * (max_pred + 2) + "+")
+
+    print( "┌" + "─" * (max_move + 2) + "┬" + "─" * (max_pred + 2) + "┐")
+    
+    for i, previsao in enumerate(previsoes_tratadas):
+        if i != maior:
+            if (previsoes[0][i] * 100) > 10:
+                print(f"│ {movimentos[i]}" + " " * (max_move - len(movimentos[i]) + 1) + "│" + f" \033[34m{previsao}\033[0m" + " " *  (max_pred - len(previsao) + 1) + "│")
+            else:
+                print(f"│ {movimentos[i]}" + " " * (max_move - len(movimentos[i]) + 1) + "│" + f" {previsao}" + " " *  (max_pred - len(previsao) + 1) + "│")
+        else:
+            print(f"│ \033[32m{movimentos[i]}\033[0m" + " " * (max_move - len(movimentos[i]) + 1) + "│" + f" \033[32m{previsao}\033[0m" + " " *  (max_pred - len(previsao) + 1) + "│")
+
+        if i < (len(previsoes_tratadas) - 1):
+            print( "├" + "─" * (max_move + 2) + "┼" + "─" * (max_pred + 2) + "┤")
+
+    
+    print( "└" + "─" * (max_move + 2) + "┴" + "─" * (max_pred + 2) + "┘")
+
     previsao = np.argmax(previsoes)
     print("\nMovimento previsto com maior certeza: ", movimentos[previsao])
 

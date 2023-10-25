@@ -284,9 +284,22 @@ while True:
 
     movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Salvar', 'Abrir o explorador de arquivos', 'Diminuir o volume', 'Aumentar o brilho', 'Diminuir o brilho', 'Control + Z', 'Control + Y', 'Confirmar']
 
+    dc = {}
+
     for i, probabilidade in enumerate(np.array(previsoes)[0]):
-        print(f'{movimentos[i]}: {probabilidade * 100:.2f}%')
+        dc[f'{i}'] = (probabilidade * 100)
+
+    pc_ord = [(movimento, porcentagem) for movimento, porcentagem in dc.items()]
+
+    movimentos_ordenados = sorted(pc_ord, key=lambda x: x[1], reverse=True)
     
+    strs = []
+
+    for (a, b) in movimentos_ordenados:
+        strs.append(f"| {movimentos[a]} | {b:.2f} |s")
+
+    print(strs)
+
     previsao = np.argmax(previsoes)
     print("\nMovimento previsto com maior certeza: ", movimentos[previsao])
 

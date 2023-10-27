@@ -11,3 +11,4 @@ pytz==2023.3.post1
 pyautogui==0.9.54
 comtypes==1.2.0
 pycaw===20230407
+optuna==3.4.0

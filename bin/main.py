@@ -195,7 +195,20 @@ while True:
 
     previsoes = model.predict(video)
 
-    movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Salvar', 'Abrir o explorador de arquivos', 'Diminuir o volume', 'Aumentar o brilho', 'Diminuir o brilho', 'Control + Z', 'Control + Y', 'Confirmar']
+    movimentos = [
+                  'Fechar Tela',
+                  'Print screen',
+                  'Ativar modo mouse virtual',
+                  'Aumentar o volume',
+                  'Ir para o canal predileto',
+                  'Abrir o explorador de arquivos',
+                  'Diminuir o volume',
+                  'Aumentar o brilho',
+                  'Diminuir o brilho',
+                  'Abrir a netflix',
+                  'Abrir o disney plus',
+                  'Confirmar'
+                ]
 
     max_move = max(len(x) for x in movimentos)
 

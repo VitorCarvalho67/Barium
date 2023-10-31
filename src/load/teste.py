@@ -38,7 +38,7 @@ exibir_conexoes = True
 mostrar_numeros = True
 dataset = "../../data/test.csv"
 
-def aumentar_contraste(frame):
+def aumentar_contraste(frane):
 
     alpha = 2
     beta = 0
@@ -72,7 +72,7 @@ while True:
     while True:
         coordenadas = []
         for a in range(21):
-            coordenadas.append([0, 0])
+            coordenadas.append((0, 0))
 
         sucesso, frame = cap.read()
         if not sucesso:
@@ -169,7 +169,7 @@ while True:
                 for coluna in range(matriz.shape[1]):
                     elemento = matriz[coluna, linha]
                     if elemento != -1:
-                        coordenadas[elemento] = [linha, coluna]
+                        coordenadas[elemento] = ((linha, coluna))
 
             foto = Image.new("RGB", (100, 100), "black")
 
@@ -186,13 +186,13 @@ while True:
                 video.write(foto)
 
             matriz = None
-            diagonal = calcular_distancia((x, y), (x + w, y + h))
-            referencial = ((x + w, y + h))
+            # diagonal = calcular_distancia((x, y), (x + w, y + h))
+            # referencial = ((x + w, y + h))
 
             linha = []
 
-            for [x, y] in coordenadas:
-                linha.append([x, y])
+            for (x, y) in coordenadas:
+                linha.append(str((x, y)))
             
             # linha.append(referencial)
             # linha.append(diagonal)
@@ -202,74 +202,7 @@ while True:
         if iteracao == -1:
             iteracao = 0
             break
-
-    dados = np.array(dados)
-
-    video = (dados).reshape((1, 840))
-
-    previsao = model.predict(video.reshape(1, -1))
-    print(previsao)
-
-    previsao = np.argmax(previsao)
-
-    movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Salvar', 'Abrir o explorador de arquivos', 'Diminuir o volume', 'Aumentar o brilho', 'Diminuir o brilho', 'Control + Z', 'Control + Y', 'Confirmar']
-
-    # print(previsao)
-
-    print("Movimento previsto: ", movimentos[previsao])
-
-    # if (movimentos[previsao] == 'Fechar Telas'):
-    #     print("tchau")
-    #     pyautogui.hotkey('win', 'd')
-
-    # elif(movimentos[previsao] == 'Print screen'):
-    #     print("abrir a mão")
-    #     pyautogui.hotkey('win', 'prtsc')
-    #     pyautogui.hotkey('ctrl', 'a')
-    #     pyautogui.hotkey('ctrl', 'c')
-
-    # elif(movimentos[previsao] == 'Ativar modo mouse virtual'):
-    #     print("Mouse Virtual")
-    #     # mouse.mouse_virtual()
-            
-    # elif(movimentos[previsao] == 'Aumentar o volume'):
-    #     print("para cima")
-    #     devices = AudioUtilities.GetSpeakers()
-    #     interface = devices.Activate(
-    #         IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-
-    #     volume = cast(interface, POINTER(IAudioEndpointVolume))
-
-    #     current_volume = volume.GetMasterVolumeLevelScalar()
-    #     new_volume = min(1.0, current_volume + 0.1)
-    #     if new_volume > 100:
-    #         volume.SetMasterVolumeLevelScalar(100, None)
-    #     else:
-    #         volume.SetMasterVolumeLevelScalar(new_volume, None)
-
-    # elif(movimentos[previsao] == 'Abrir o explorador de arquivos'):
-    #     print("Mão reta para a esquerda")
-    #     pyautogui.hotkey('win', 'e')
-    
-    # elif(movimentos[previsao] == 'Salvar'):
-    #     pyautogui.hotkey('win', 's')
-    # elif(movimentos[previsao] == 'Diminuir o volume'):
-    #     devices = AudioUtilities.GetSpeakers()
-    #     interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-
-    #     volume = cast(interface, POINTER(IAudioEndpointVolume))
-
-    #     current_volume = volume.GetMasterVolumeLevelScalar()
-    #     new_volume = min(1.0, current_volume - 0.1)
-    #     if new_volume < 0:
-    #         volume.SetMasterVolumeLevelScalar(0, None)
-    #     else:
-    #         volume.SetMasterVolumeLevelScalar(new_volume, None)
-    # elif(movimentos[previsao] == 'Diminuir o volume'):
-    #     print("Confirmar")
-    # else:
-    #     print("Movimento não reconhecido")
-
+   
     input_v = 1
 
     if input_v == '0':

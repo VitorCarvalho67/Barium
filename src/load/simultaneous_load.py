@@ -22,6 +22,8 @@ from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
+tempo_previsao = time.time() * 1000
+
 certezas = []
 
 model = load_model("../../models/modelTest.keras")
@@ -133,8 +135,8 @@ while True:
                 if elemento != -1:
                     coordenadas[elemento] = [linha, coluna]
 
-        diagonal = calcular_distancia((x, y), (x + w, y + h))
-        referencial = ((x + w, y + h))
+        # diagonal = calcular_distancia((x, y), (x + w, y + h))
+        # referencial = ((x + w, y + h))
 
         linha = []
 
@@ -198,7 +200,10 @@ while True:
 
     certezas.append(certeza)
 
-    print(f"{movimentos[previsao]}, {certeza*100:.2f}%")
+    if(certeza > .9):
+        if time.time() * 1000 - tempo_previsao > 2000:
+            print(f"{movimentos[previsao]}, {certeza*100:.2f}%")
+            tempo_previsao = time.time() * 1000
 
     input_v = cv2.waitKey(1)
 

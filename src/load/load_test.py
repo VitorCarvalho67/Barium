@@ -4,7 +4,6 @@ projeto_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
 sys.path.append(projeto_dir)
 
 from modules import mouse
-import csv
 import cv2
 import mediapipe as mp
 import math
@@ -79,7 +78,6 @@ while True:
             continue
 
         frame = cv2.flip(frame, 1)
-        
 
         resultados = maos.process(cv2.cvtColor(aumentar_contraste(frame), cv2.COLOR_BGR2RGB))
 
@@ -113,6 +111,9 @@ while True:
 
 
         if not numero == -1 and iteracao < 20:
+
+            pontos_ass = [] 
+
             tempo_atual = time.time() * 1000
 
             if tempo_atual - tempo_anterior >= intervalo or iteracao == 0:            
@@ -121,9 +122,13 @@ while True:
                 matriz = np.full((100, 100), -1, dtype=int)
                 if lista_pontos:
                     for idx, ponto in enumerate(lista_pontos):
-                        x_rel = (ponto[0] - x) * 100 // w
                         y_rel = (ponto[1] - y) * 100 // h
+                        x_rel = (ponto[0] - x) * 100 // w
                         valor = idx
+
+                        if(idx == 4 or idx == 8 or idx == 12 or idx == 16 or idx == 20):
+                            pontos_ass.append([x_rel, y_rel])
+
                         matriz[y_rel][x_rel] = valor    
 
                 iteracao += 1
@@ -144,24 +149,44 @@ while True:
                 
                 print(f"Dados{valor_video}registrados!")
 
-            key = cv2.waitKey(1) & 0xFF
+            nao_mexe_porque_assim_funciona = cv2.waitKey(1)
+
+            if len(lista_pontos) > 20:
 
 
-            if key in range(ord('0'), ord('9') + 1) and lista_pontos:
-                numero = chr(key)
+                pontos_ass = []
 
-                tempo_anterior = time.time() * 1000 
+                for idx, ponto in enumerate(lista_pontos):
+                    y_rel = (ponto[1] - y) * 100 // h
+                    x_rel = (ponto[0] - x) * 100 // w
+                    valor = idx
 
-                if salvar_videos:
-                    m_video = f'{diretorio}/video_{z}.mp4'
-                    duracao_frame = 10
+                    if(idx == 4 or idx == 8 or idx == 12 or idx == 16 or idx == 20):
+                        pontos_ass.append([x_rel, y_rel])
 
-                    pre = cv2.VideoWriter_fourcc(*'mp4v')
-                    video = cv2.VideoWriter(m_video, pre, duracao_frame, (100, 100))
+                factor = 25
+
+                p4 = pontos_ass[0]
+                p8 = pontos_ass[1]
+                p12 = pontos_ass[2]
+                p16 = pontos_ass[3]
+                p20 = pontos_ass[4]
+
+                d1 = calcular_distancia(p4, p8)
+                d2 = calcular_distancia(p8, p12)
+                d3 = calcular_distancia(p12, p16)
+                d4 = calcular_distancia(p16, p20)
+                d5 = calcular_distancia(p20, p4)
 
 
-                z += 1
-                print(z)
+                if (d1 < factor and d2 < factor and d3 < factor and d4 < factor and d5 < factor):
+                    time.sleep(1)
+
+                    tempo_anterior = time.time() * 1000
+                    numero = 1
+
+                    z += 1
+                    print("Z: ",  z)
 
         if matriz is not None:
             for linha in range(matriz.shape[0]):
@@ -210,8 +235,21 @@ while True:
 
     previsoes = model.predict(video)
 
-    movimentos = ['Fechar Telas', 'Print screen', 'Ativar modo mouse virtual', 'Aumentar o volume', 'Salvar', 'Abrir o explorador de arquivos', 'Diminuir o volume', 'Aumentar o brilho', 'Diminuir o brilho', 'Control + Z', 'Control + Y', 'Confirmar']
-
+    movimentos = [
+                  'Fechar Telas',
+                  'Print screen',
+                  'Ativar modo mouse virtual',
+                  'Aumentar o volume',
+                  'Ir para o canal predileto',
+                  'Abrir o explorador de arquivos',
+                  'Diminuir o volume',
+                  'Aumentar o brilho',
+                  'Diminuir o brilho',
+                  'Abrir a netflix',
+                  'Abrir o disney plus',
+                  'Confirmar'
+                ]
+    
     max_move = max(len(x) for x in movimentos)
 
     previsoes_tratadas = []

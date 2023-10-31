@@ -1,2 +1,5 @@
 venv/
 src/collector/
+dist/
+build/
+src/load/buid/

@@ -142,8 +142,6 @@ while True:
                     video.release()
                     valor_video += "e vídeo "
                 
-                print(f"Dados{valor_video}registrados!")
-
             key = cv2.waitKey(1) & 0xFF
 
 
@@ -161,7 +159,6 @@ while True:
 
 
                 z += 1
-                print(z)
 
         if matriz is not None:
             for linha in range(matriz.shape[0]):

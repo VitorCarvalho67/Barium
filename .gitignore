@@ -4,3 +4,4 @@ bin/venv
 dist/
 build/
 src/load/buid/
+video/

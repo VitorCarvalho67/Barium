@@ -238,7 +238,7 @@ while True:
             
             if count_coord <= 19:
                 count_coord += 1
-
+                
             else:
                 imagens[count_img] = imagem
                 imagem = np.zeros((21, 2))

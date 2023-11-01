@@ -18,6 +18,72 @@ import pyautogui
 from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton
+from PyQt5.QtGui import QPixmap
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import QTimer
+from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget
+
+def on_button_click():
+    app.quit()
+
+app = QApplication(sys.argv)
+window = QMainWindow()
+window.setWindowTitle("Barium")
+window.setGeometry(100, 100, 700, 500)
+window.setFixedSize(700, 500)
+window.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+window.setWindowIcon(QIcon("../../img/LOGO.ico"))
+window.setStyleSheet("background-color: #1e1e2e;")
+
+central_widget = QLabel(window)
+central_widget.setPixmap(QPixmap("../../img/LogoApp.png").scaled(200, 40))
+# central_widget.setGeometry(0, 0, 700, 500) Aqui as coisas ficaram no centro, mas não sei se é o melhor jeito
+central_widget.setGeometry(0, 0, 250, 80)
+central_widget.setAlignment(QtCore.Qt.AlignCenter)
+
+button = QPushButton("", window)
+button.setStyleSheet("background-color: #077208; border-radius: 15px;")
+button.setGeometry(650, 80, 30, 30)
+button.clicked.connect(on_button_click, QtCore.Qt.UniqueConnection)
+
+
+btn1 = QPushButton("Mouse", window)
+btn2 = QPushButton("Teclado", window)
+btn3 = QPushButton("Configurações", window)
+btn4 = QPushButton("Movimentos", window)
+btn5 = QPushButton("Jogos", window)
+Texto = QLabel("Movimento:",window)
+label = QLabel("Image", window)
+
+
+##########
+
+central_layout = QVBoxLayout()
+central_widget.setLayout(central_layout)
+window.setCentralWidget(central_widget)
+
+##########
+
+Texto.setGeometry(20, 400, 200, 25)
+btn1.setGeometry(200, 400, 70, 25)
+btn2.setGeometry(290, 400, 70, 25)
+btn3.setGeometry(380, 400, 100, 25)
+btn4.setGeometry(500, 400, 100, 25)
+btn5.setGeometry(620, 400, 70, 25)
+label.setGeometry(0, 0, 0, 0)
+
+Texto.setStyleSheet("color: #CDD6F4; font-size: 14px;")
+btn1.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
+btn2.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
+btn3.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
+btn4.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
+btn5.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
+label.setStyleSheet("border-radius: 10px")
+
+window.show()
 
 model = load_model("../../models/modelTest.keras")
 
@@ -147,7 +213,7 @@ while True:
                     video.release()
                     valor_video += "e vídeo "
                 
-                print(f"Dados{valor_video}registrados!")
+                # print(f"Dados{valor_video}registrados!")
 
             nao_mexe_porque_assim_funciona = cv2.waitKey(1)
 
@@ -223,7 +289,15 @@ while True:
 
             matrizes.append(linha)
 
-        cv2.imshow("Câmera", aumentar_contraste(frame))
+        # cv2.imshow("Câmera", aumentar_contraste(frame))
+
+        frame = cv2.cvtColor(aumentar_contraste(frame), cv2.COLOR_BGR2RGB)
+        height_frame, width_frame, channels = frame.shape
+        step = channels * width_frame
+        qImg = QImage(frame.data, width_frame, height_frame, step, QImage.Format_RGB888)
+        pixmap = QPixmap.fromImage(qImg)
+        central_widget.setPixmap(pixmap)
+        label.setScaledContents(True)
 
         if iteracao == -1:
             iteracao = 0
@@ -265,31 +339,31 @@ while True:
     
     max_pred = max(len(x) for x in previsoes_tratadas)
 
+
+    # print( "┌" + "─" * (max_move + 2) + "┬" + "─" * (max_pred + 2) + "┐")
+    
     # for i, previsao in enumerate(previsoes_tratadas):
-    #     print( "+" + "-" * (max_move + 2) + "+" + "-" * (max_pred + 2) + "+")
-    #     print(f"| {movimentos[i]}" + " " * (max_move - len(movimentos[i]) + 1) + "|" + f" {previsao}" + " " *  (max_pred - len(previsao) + 1) + "|")
+    #     if i != maior:
+    #         if (previsoes[0][i] * 100) > 10:
+    #             print(f"│ {movimentos[i]}" + " " * (max_move - len(movimentos[i]) + 1) + "│" + f" \033[34m{previsao}\033[0m" + " " *  (max_pred - len(previsao) + 1) + "│")
+    #         else:
+    #             print(f"│ {movimentos[i]}" + " " * (max_move - len(movimentos[i]) + 1) + "│" + f" {previsao}" + " " *  (max_pred - len(previsao) + 1) + "│")
+    #     else:
+    #         print(f"│ \033[32m{movimentos[i]}\033[0m" + " " * (max_move - len(movimentos[i]) + 1) + "│" + f" \033[32m{previsao}\033[0m" + " " *  (max_pred - len(previsao) + 1) + "│")
 
-    # print( "+" + "-" * (max_move + 2) + "+" + "-" * (max_pred + 2) + "+")
-
-    print( "┌" + "─" * (max_move + 2) + "┬" + "─" * (max_pred + 2) + "┐")
-    
-    for i, previsao in enumerate(previsoes_tratadas):
-        if i != maior:
-            if (previsoes[0][i] * 100) > 10:
-                print(f"│ {movimentos[i]}" + " " * (max_move - len(movimentos[i]) + 1) + "│" + f" \033[34m{previsao}\033[0m" + " " *  (max_pred - len(previsao) + 1) + "│")
-            else:
-                print(f"│ {movimentos[i]}" + " " * (max_move - len(movimentos[i]) + 1) + "│" + f" {previsao}" + " " *  (max_pred - len(previsao) + 1) + "│")
-        else:
-            print(f"│ \033[32m{movimentos[i]}\033[0m" + " " * (max_move - len(movimentos[i]) + 1) + "│" + f" \033[32m{previsao}\033[0m" + " " *  (max_pred - len(previsao) + 1) + "│")
-
-        if i < (len(previsoes_tratadas) - 1):
-            print( "├" + "─" * (max_move + 2) + "┼" + "─" * (max_pred + 2) + "┤")
+    #     if i < (len(previsoes_tratadas) - 1):
+    #         print( "├" + "─" * (max_move + 2) + "┼" + "─" * (max_pred + 2) + "┤")
 
     
-    print( "└" + "─" * (max_move + 2) + "┴" + "─" * (max_pred + 2) + "┘")
+    # print( "└" + "─" * (max_move + 2) + "┴" + "─" * (max_pred + 2) + "┘")
 
     previsao = np.argmax(previsoes)
-    print("\nMovimento previsto com maior certeza: ", movimentos[previsao])
+    # print("\nMovimento previsto com maior certeza: ", movimentos[previsao])
+    
+    texto = "Movimento: " + movimentos[previsao] + " - " + str(previsoes_tratadas[previsao])
+    # texto = f"Movimento: {movimentos[previsao]} - {previsoes_tratadas[previsao]}"
+
+    Texto.setText(texto)
 
     # if (movimentos[previsao] == 'Fechar Telas'):
     #     print("tchau")

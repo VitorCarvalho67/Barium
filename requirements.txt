@@ -13,3 +13,5 @@ comtypes==1.2.0
 pycaw===20230407
 optuna==3.4.0
 pyqt5==5.15.7
+pygame==2.5.2
+

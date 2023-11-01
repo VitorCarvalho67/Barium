@@ -28,6 +28,8 @@ from PyQt5.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget
 
 def on_button_click():
     app.quit()
+    
+
 
 app = QApplication(sys.argv)
 window = QMainWindow()
@@ -77,11 +79,16 @@ label.setGeometry(0, 0, 0, 0)
 
 Texto.setStyleSheet("color: #CDD6F4; font-size: 14px;")
 btn1.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
+btn1.setGeometry(240, 400, 70, 25)
+btn1.clicked.connect(on_button_click)
+
+
 btn2.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
 btn3.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
 btn4.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
 btn5.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
 label.setStyleSheet("border-radius: 10px; color: #CDD6F4; font-size: 14px; background-color: #1e1e5e;")
+
 
 # O vídeo etsá no canto superior esquerdo, aparecendo só um pedaço da imagem
 label.setGeometry(20, 70, 350, 300)

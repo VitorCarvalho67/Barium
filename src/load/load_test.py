@@ -384,9 +384,9 @@ while True:
         plt.figure(figsize=(10, 10))
         nx.draw(image_mao, pos, node_size=150, node_color=list(node_colors.values()), edge_color="#EE4740", arrows=False, with_labels=False)
         # nx.draw(image_mao, pos, node_size=150, node_color="#007FFF", edge_color="#003566", arrows=False, with_labels=False)
-        plt.savefig("mao.png", transparent=True, dpi=300)
+        plt.savefig("../../img/mao.png", transparent=True, dpi=300)
 
-        pixmap = pixmap = QPixmap("mao.png")
+        pixmap = pixmap = QPixmap("../../img/mao.png")
         label2.setPixmap(pixmap)
 
     if iteracao == -1:

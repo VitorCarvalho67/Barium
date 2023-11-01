@@ -59,19 +59,19 @@ Texto = QLabel("Movimento:",window)
 label = QLabel("Image", window)
 
 
-##########
+# ##########
 
-central_layout = QVBoxLayout()
-central_widget.setLayout(central_layout)
-window.setCentralWidget(central_widget)
+# central_layout = QVBoxLayout()
+# central_widget.setLayout(central_layout)
+# window.setCentralWidget(central_widget)
 
-##########
+# ##########
 
 Texto.setGeometry(20, 400, 200, 25)
-btn1.setGeometry(200, 400, 70, 25)
-btn2.setGeometry(290, 400, 70, 25)
-btn3.setGeometry(380, 400, 100, 25)
-btn4.setGeometry(500, 400, 100, 25)
+btn1.setGeometry(240, 400, 70, 25)
+btn2.setGeometry(320, 400, 70, 25)
+btn3.setGeometry(400, 400, 100, 25)
+btn4.setGeometry(510, 400, 100, 25)
 btn5.setGeometry(620, 400, 70, 25)
 label.setGeometry(0, 0, 0, 0)
 
@@ -81,7 +81,12 @@ btn2.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6
 btn3.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
 btn4.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
 btn5.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
-label.setStyleSheet("border-radius: 10px")
+label.setStyleSheet("border-radius: 10px; color: #CDD6F4; font-size: 14px; background-color: #1e1e5e;")
+
+# O vídeo etsá no canto superior esquerdo, aparecendo só um pedaço da imagem
+label.setGeometry(20, 70, 350, 300)
+label.setAlignment(QtCore.Qt.AlignCenter)
+label.setScaledContents(True)
 
 window.show()
 
@@ -295,9 +300,9 @@ while True:
         height_frame, width_frame, channels = frame.shape
         step = channels * width_frame
         qImg = QImage(frame.data, width_frame, height_frame, step, QImage.Format_RGB888)
-        pixmap = QPixmap.fromImage(qImg)
-        central_widget.setPixmap(pixmap)
-        label.setScaledContents(True)
+        
+        label.setPixmap(QPixmap.fromImage(qImg))
+
 
         if iteracao == -1:
             iteracao = 0

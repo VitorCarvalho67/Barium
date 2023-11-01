@@ -78,40 +78,6 @@ btn5.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6
 
 window.show()
 sys.exit(app.exec_())
-# tk = Tk()
-# tk.title("Barium")
-# tk.geometry("700x500")
-# tk.resizable(False, False)
-# tk.eval('tk::PlaceWindow . center')
-# tk.configure(bg='#1e1e2e')
-# tk.iconbitmap('../../img/LOGO.ico')
-# tk.attributes('-topmost', True)
-
-# logo_image = Image.open("../../img/LogoApp.png").resize((200, 40))
-# logo_photo = ImageTk.PhotoImage(logo_image)
-
-# logo_label = ttk.Label(tk, image=logo_photo)
-# logo_label.grid(column=0, row=1, padx=10, pady=10)
-# logo_label.configure(background='#1e1e2e')
-
-# Create a custom style for the button with a green background
-# style = ttk.Style()
-# style.configure("Green.TButton",
-#     background='#00FF00',
-#     border='False',
-#     lightcolor='#00FF00',
-#     darkcolor='#00FF00'
-# )
-
-# # Use the custom style for the button
-# ttk.Button(tk, text=" ", command=tk.destroy, style="Green.TButton").grid(column=0, row=2, padx=100, pady=10)
-
-# # Resize the image
-# logo_label.image = logo_photo
-
-# tk.mainloop()
-
-
 
 # tempo_previsao = time.time() * 1000
 

@@ -14,12 +14,13 @@ time é o tempo em segundos desde o início da coleta
 
 O arquivo de saída será um arquivo CSV com os dados de todos os movimentos
 Exemplo de arquivo de saída:
+
 ```csv
 "(75, 95)","(87, 79)","(91, 55)","(90, 37)","(89, 23)","(59, 37)","(48, 18)","(40, 9)","(32, 3)","(46, 42)","(34, 23)","(26, 13)","(18, 6)","(38, 50)","(25, 34)","(18, 26)","(11, 19)","(32, 62)","(21, 50)","(14, 43)","(8, 36)","(280, 308)",384.66608896548183,"(42, 96)","(58, 85)","(70, 67)","(75, 53)","(79, 43)","(52, 43)","(51, 24)","(51, 14)","(50, 5)","(41, 42)","(40, 23)","(39, 12)","(39, 3)","(31, 45)","(29, 27)","(29, 16)","(29, 7)","(22, 52)","(20, 37)","(19, 28)","(20, 19)","(327, 326)",434.16356364854016," ... "(76, 95)","(88, 78)","(89, 56)","(87, 41)","(86, 29)","(56, 36)","(43, 20)","(33, 11)","(26, 3)","(47, 42)","(33, 25)","(25, 16)","(19, 8)","(39, 50)","(26, 34)","(18, 25)","(12, 17)","(32, 61)","(21, 47)","(15, 38)","(10, 30)","(277, 297)",377.59502115361636,0
 ```
 
 Onde:
-As linhas podem ser interpretadas como vídeos dos pontos da mão em movimento sendo que cada linha é 21 frames do vídeo (20 pontos da mão) 
+As linhas podem ser interpretadas como vídeos dos pontos da mão em movimento sendo que cada linha é 21 frames do vídeo (20 pontos da mão)
 
 Onde:
 p0_0 são as coordenadas x e y do ponto 0 da mão no frame 0
@@ -29,31 +30,36 @@ p20_0 são as coordenadas x e y do ponto 20 da mão no frame 0
 
 O arquivo CSV será utilizado para treinar um modelo de machine learning
 O modelo de machine learning será utilizado para reconhecer os movimentos da mão
-O modelo de machine learning será utilizado para controlar o computador com os movimentos da mão, tendo alguns movimentos pré-definidos resultando em ações 
+O modelo de machine learning será utilizado para controlar o computador com os movimentos da mão, tendo alguns movimentos pré-definidos resultando em ações
 
 pré-definidas como:
 
 - movimento1: não fazer nada (não reconhecer o movimento)
+
 ```python
     print('Nada')
 ```
 
 - movimento2: Windows + E (mão reta para o lado direito) ✔
+
 ```python
     pyautogui.hotkey('win', 'e')
 ```
 
 - movimento3: Windows + D (tchau) ✔
+
 ```python
 pyautogui.hotkey('win', 'd')
 ```
 
 - movimento4: Windows + S (estende a mão para cima) ✔
+
 ```python
 pyautogui.hotkey('win', 's')
 ```
 
 - movimento5: aumentar o volume (dedo indicador para cima) ✔
+
 ```python
 devices = AudioUtilities.GetSpeakers()
 interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
@@ -66,6 +72,7 @@ volume.SetMasterVolumeLevelScalar(new_volume, None)
 ```
 
 - movimento6: diminuir o volume (dedo indicador para baixo) ✔
+
 ```python
 devices = AudioUtilities.GetSpeakers()
 interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
@@ -78,6 +85,7 @@ volume.SetMasterVolumeLevelScalar(new_volume, None)
 ```
 
 - movimento7: aumentar o brilho (pinça com os dedos indicador e polegar para cima) ✔
+
 ```python
 import wmi
 
@@ -95,6 +103,7 @@ increase_brightness(10)
 ```
 
 - movimento8: diminuir o brilho (pinça com os dedos indicador e polegar para baixo) ✔
+
 ```python
 import wmi
 
@@ -112,40 +121,49 @@ decrease_brightness(10)
 ```
 
 - movimento9:  ctrl + z (like para o lado esquerdo) ✔
+
 ```python
 pyautogui.hotkey('ctrl', 'z')
 ```
 
 - movimento10: ctrl + y (like para o lado direito) ✔
+
 ```python
 pyautogui.hotkey('ctrl', 'y')
 ```
 
 - movimento11: abrir/fechar o menu iniciar (mão com se estivesse segurando uma maçã girando)
+
 ```python
 pyautogui.hotkey('win')
 ```
 
 - movimento12: alt + f4 (dedos para o pulso menos o polegar)
+
 ```python
 pyautogui.hotkey('alt', 'f4')
 ```
+
 - movimento13: alt + tab (estralar os dedos indicador e médio)
+
 ```python
 pyautogui.hotkey('alt', 'tab')
 ```
 
 - movimento14: ctrl + shift + esc (mão reta para o lado esquerdo)
+
 ```python
 pyautogui.hotkey('ctrl', 'shift', 'esc')
 ```
 
 - movimento15: ctrl + shift + t (dedos do puslo para cima)
+
 ```python
 pyautogui.hotkey('ctrl', 'shift', 't')
 ```
 
 - movimento16: print screen (Abrir a mão) ✔
+
 ```python
 pyautogui.hotkey('win', 'prtsc')
 pyautogui.hotkey('ctrl', 'a')
@@ -153,49 +171,27 @@ pyautogui.hotkey('ctrl', 'c')
 ```
 
 - movimento17: Abrir a nagevação mouse (Z com o indicador) ✔
+
 ```python
 mouse.mouse_virtual()
 ```
 
-- movimento18: confirmar ação (like)
+- movimento18: confirmar ação (like) ✔
+
 ```python
 pyautogui.hotkey('enter')
 ```
 
 - movimento19: f11 (V em libras para U em libras)
+
 ```python
 pyautogui.hotkey('f11')
 ```
 
 - movimento20: abrir o navegador (mão reta para cima)
+
 ```python
 pyautogui.hotkey('win', 's')
 pyautogui.typewrite('chrome')
 pyautogui.hotkey('enter')
 ```
-
-Proximas ações:
-
-1. Add também um registro de nada
-
-2. Script para popular o dataset com movimentos de erro
-
-3. Arrumar o modo mouse (Ele tem que verificar a cada milissegundo  se houve uma alteração na posição dos dedos e ai sim dar um set += / Se tiver um diferença muito grande não muda nada)
-
-4. Treinar ela com a posição do quadrado (Deixar relativo / As câmeras têm dimensões diferentes)
-
-5. Add é mais movimentos
-
-6. Outra coisa é fazer outro ativador de coleta do movimento (All time / Comando de voz)
-
-7. Interface gráfica para o usuário descktop
-
-8. Site informativo e para download
-
-9. Criação de um vídeo de apresentação do projeto
-
-10. Criação dos slides de apresentação do projeto
-
-11. Criação do artigo científico
-
-12. melhorar a captura de movimentos com o filtro

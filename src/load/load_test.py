@@ -141,8 +141,8 @@ if salvar_videos:
 intervalo = 100
 quantidade_de_frames = 20
 
-exibir_conexoes = True
-mostrar_numeros = True
+exibir_conexoes = False
+mostrar_numeros = False
 dataset = "../../data/test.csv"
 
 def aumentar_contraste(frame):
@@ -366,7 +366,6 @@ while True:
         max_x = max(nodes, key=lambda x: x[0])[0]
         max_y = max(nodes, key=lambda x: x[1])[1]
 
-        print(max_x, max_y)
 
         for i in range(21):
             image_mao.add_node(f'p{i}')

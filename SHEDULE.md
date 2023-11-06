@@ -1,14 +1,10 @@
 # Próximas ações:
 
-1. [X] *Decidir sobre o ativador do software;*
-2. [X] *Acabar o código do ativador;*
-3. [ ] Fazer o binário da aplicação;
-4. [ ] *Terminar o modo teclado e modo mouse;*
-5. [ ] *Terminar as lista de movimentos do DEV.md;*
-6. [ ] *Fazer o documento (Artigo científico);*
-    <<<<<<< HEAD
-7. [ ] *Fazer uma interface para usuário em tkinter;*
-   =================================================
-8. [ ] *Fazer uma interface para usuário em QT;*
-9. [ ] *Ligar as ações com as respectivas ações no os;*
-1. [ ] *Jogo da cobrinha (Colocar IA para fazer os movimentos));*
+- [ ] Arrumar o dev.md e deixar movimentos menos confundíveis com ações no OS mais focada nos users;
+- [ ] Deixar o código em POO com multithreading;
+- [ ] Arrumar o dataset, tirar alguns movimentos;
+- [ ] Treinar a rede com esses novos movimentos;
+- [ ] Terminar o modo mouse e teclado;
+- [ ] Terminar a GUI com os movimentos associados as ações no OS e a janela do jogo;
+- [ ] Fazer o binário;
+- [ ] Fazer o TCC;

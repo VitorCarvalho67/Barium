@@ -56,18 +56,52 @@ class VideoCaptureThread(QThread):
 
         imagem = cv2.convertScaleAbs(frame, alpha=alpha, beta=beta)
 
-        return imagem
-
-    def getCoordinates(self, frame):
-        mp_maos = mp.solution.hands
-        maos = mp_maos.Hans(max_num_hands=1)
+        mp_maos = mp.solutions.hands
+        maos = mp_maos.Hands(max_num_hands=1)
 
         coordenadas =[]
         for a in range (21):
-            coordenadas.append([0, ])
+            coordenadas.append([0, 0])
+
+        resultados = maos.process(cv2.cvtColor(imagem, cv2.COLOR_BGR2RGB))
+
+        lista_pontos = []
+
+        if resultados.multi_hand_landmarks:
+            for pontos_mao in resultados.multi_hand_landmarks:
+                for idx, ponto in enumerate(pontos_mao.landmark):
+                    altura, largura, _ = frame.shape
+                    cx, cy = int(ponto.x * largura), int(ponto.y * altura)
+                    lista_pontos.append((cx, cy))
+
+                if lista_pontos:
+                    x, y, w, h = cv2.boundingRect(np.array(lista_pontos))
+                    tamanho_max = max(w, h)
+
+                    centro_x = x + w // 2
+                    centro_y = y + h // 2
+
+                    x = centro_x - tamanho_max // 2
+                    y = centro_y - tamanho_max // 2
+
+                    x, y, w, h = x - 10, y - 10, tamanho_max + 20, tamanho_max + 20
+
+                    cv2.rectangle(imagem, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+                mp.solutions.drawing_utils.draw_landmarks(imagem, pontos_mao, mp_maos.HAND_CONNECTIONS)
+
+        return imagem
+
+    # def getCoordinates(self, frame):
+    #     mp_maos = mp.solution.hands
+    #     maos = mp_maos.Hans(max_num_hands=1)
+
+    #     coordenadas =[]
+    #     for a in range (21):
+    #         coordenadas.append([0, ])
     
 
-        resultados = maos.process(cv2.cvtColor(self.__aumentar_contraste)frame)), cv2.COLOR_BGR2RGB)
+        # resultados = maos.process(cv2.cvtColor(self.__aumentar_contraste)frame)), cv2.COLOR_BGR2RGB)
 
 class UI():
     def __init__(self):
@@ -149,15 +183,13 @@ class UI():
         self.label.setPixmap(QPixmap.fromImage(frame))
         
 
-class ProcessMotion(Thread):
-    def __init__(self):
-        self.model = load_model('../../models/modelTest.keras')
-        self.intervalo = 100
-        self.numberFrames = 20
-        self.exibir_conexoes = False
-        self.mostrar_numeros = False
-        
-        
+# class ProcessMotion(Thread):
+#     def __init__(self):
+#         self.model = load_model('../../models/modelTest.keras')
+#         self.intervalo = 100
+#         self.numberFrames = 20
+#         self.exibir_conexoes = False
+#         self.mostrar_numeros = False
         
 
 def main():

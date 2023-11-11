@@ -42,7 +42,7 @@ class VideoCaptureThread(QThread):
 
             frame = cv2.flip(frame, 1)
 
-            frame = self.__aumentar_contraste(frame)
+            frame = self.__getCoordinates(frame)
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
             height, width, channel = frame.shape
@@ -50,7 +50,7 @@ class VideoCaptureThread(QThread):
             qImg = QImage(frame.data, width, height, step, QImage.Format_RGB888)
             self.frameCaptured.emit(qImg)
 
-    def __aumentar_contraste(self, frame):
+    def __getCoordinates(self, frame):
         alpha = 2
         beta = 0
 
@@ -59,10 +59,8 @@ class VideoCaptureThread(QThread):
         mp_maos = mp.solutions.hands
         maos = mp_maos.Hands(max_num_hands=1)
 
-        coordenadas =[]
-        for a in range (21):
-            coordenadas.append([0, 0])
-
+        x, y, w, h = 0, 0, 0, 0
+        
         resultados = maos.process(cv2.cvtColor(imagem, cv2.COLOR_BGR2RGB))
 
         lista_pontos = []
@@ -89,20 +87,61 @@ class VideoCaptureThread(QThread):
                     cv2.rectangle(imagem, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
                 mp.solutions.drawing_utils.draw_landmarks(imagem, pontos_mao, mp_maos.HAND_CONNECTIONS)
+        coordenadas = self.ProcessarCoordenadas(lista_pontos, x, y, w, h)
+        self.searchOrder(coordenadas)
 
         return imagem
-
-    # def getCoordinates(self, frame):
-    #     mp_maos = mp.solution.hands
-    #     maos = mp_maos.Hans(max_num_hands=1)
-
-    #     coordenadas =[]
-    #     for a in range (21):
-    #         coordenadas.append([0, ])
     
+    def ProcessarCoordenadas(self, lista_pontos, x, y, w, h):
+        coordenadas = []
+        
+        self.a = 0
+        self.valor = 0
 
-        # resultados = maos.process(cv2.cvtColor(self.__aumentar_contraste)frame)), cv2.COLOR_BGR2RGB)
+        for self.a in range(21):
+            coordenadas.append([0, 0])
+        
+        matriz = np.full((100, 100), -1, dtype=int)
+        
+        if lista_pontos:
+            for idx, ponto in enumerate(lista_pontos):
+                y_rel = (ponto[1] - y) * 100 // h
+                x_rel = (ponto[0] - x) * 100 // w
+            
+                matriz[y_rel][x_rel] = idx
 
+        for linha in range(matriz.shape[0]):
+            for coluna in range(matriz.shape[1]):
+                elemento = matriz[coluna, linha]
+                if elemento != -1:
+                    coordenadas[elemento] = [linha, coluna]
+
+        return coordenadas
+
+    def searchOrder(self, coordenadas):
+        pontos_ass = []
+
+        for idx, ponto in enumerate(coordenadas):
+            if(idx == 4 or idx == 8 or idx == 12 or idx == 16 or idx == 20):
+                pontos_ass.append([ponto[1], ponto[1]])
+            
+        factor = 25
+
+        ds = []
+
+        for i in range(len(pontos_ass)):
+            if i == 4:
+                ds.append(self.calcular_distancia(pontos_ass[0], pontos_ass[i]))
+            else:
+                ds.append(self.calcular_distancia(pontos_ass[i], pontos_ass[i + 1]))
+
+        if (ds[0] < factor and ds[1] < factor and ds[2] < factor and ds[3] < factor and ds[4] < factor):
+            print("Pedido de análise")
+    
+    def calcular_distancia(self, ponto1, ponto2):
+        return math.sqrt(((ponto2[0] - ponto1[0]) ** 2) + ((ponto2[1] - ponto1[1]) ** 2))
+
+    
 class UI():
     def __init__(self):
         super().__init__()
@@ -173,7 +212,6 @@ class UI():
         self.video_thread.frameCaptured.connect(self.SetVideo)
         self.video_thread.start()
 
-
     def __on_button_click(self):
         self.app.quit()
 
@@ -181,7 +219,7 @@ class UI():
         max_width = 380
         self.label.setGeometry(20, 70, max_width, int(frame.height() / (frame.width()/max_width)))
         self.label.setPixmap(QPixmap.fromImage(frame))
-        
+
 
 # class ProcessMotion(Thread):
 #     def __init__(self):

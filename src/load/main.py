@@ -52,7 +52,8 @@ class VideoCaptureThread(QThread):
         while True:
             sucesso, frame = self.cap.read()
             if not sucesso:
-                continue
+                print("Não foi possível obter o frame.")
+                break
 
             frame = cv2.flip(frame, 1)
 
@@ -63,6 +64,8 @@ class VideoCaptureThread(QThread):
             step = channel * width
             qImg = QImage(frame.data, width, height, step, QImage.Format_RGB888)
             self.frameCaptured.emit(qImg)
+            
+            cv2.waitKey(1)
 
     def __getCoordinates(self, frame):
         alpha = 2

@@ -22,15 +22,18 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPixmap, QImage, QIcon
 from PyQt5.QtCore import QTimer, QThread, Qt, QThread, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget, QApplication, QMainWindow, QLabel, QPushButton
+from memory_profiler import profile
 import networkx as nx
 import matplotlib.pyplot as plt
 
+@profile
 class VideoCaptureThread(QThread):
     print("Iniciando thread de captura de vídeo...")
     frameCaptured = pyqtSignal(QImage)
     handImage = pyqtSignal(str)
     predictMove = pyqtSignal(str)
-
+    
+    @profile
     def __init__(self):
         print("Iniciando captura de vídeo...")
         super().__init__()
@@ -50,14 +53,18 @@ class VideoCaptureThread(QThread):
 
         self.video = []
         
-
+    @profile
     def run(self):
         print("Executando captura de vídeo...")
         while True:
             sucesso, frame = self.cap.read()
             if not sucesso:
                 print("Não foi possível obter o frame.")
-                break
+                continue
+                
+            if frame is None:
+               print("Não foi possível obter o frame inciando mesmo sem frame .")
+               continue
 
             frame = cv2.flip(frame, 1)
 
@@ -71,7 +78,8 @@ class VideoCaptureThread(QThread):
             
             cv2.waitKey(1)
             print("Capturando vídeo...")
-
+     
+    @profile 
     def __getCoordinates(self, frame):
         print("executando processo de obtenção de coordenadas...")
         alpha = 2
@@ -146,7 +154,7 @@ class VideoCaptureThread(QThread):
 
         return imagem
    
-    
+    @profile
     def ProcessarCoordenadas(self, lista_pontos, x, y, w, h):
         print("executando processo de processamento de coordenadas...")
         coordenadas = []
@@ -174,7 +182,7 @@ class VideoCaptureThread(QThread):
 
         return coordenadas
     
-
+    @profile
     def searchOrder(self, coordenadas):
         print("executando processo de busca de ordem...")
         pontos_ass = []
@@ -203,7 +211,7 @@ class VideoCaptureThread(QThread):
                 self.video_frame = 1
                 self.tempo_anterior = time.time() * 1000
                 
-    
+    @profile
     def predict(self, dados):
         print("executando predict")
         dados = (dados).reshape((1, 840))
@@ -243,13 +251,14 @@ class VideoCaptureThread(QThread):
         self.predictMove.emit(texto)
 
         previsoes_tratadas = []
-
+    @profile
     def load_model(self):
         print("Carregando modelo...")
         model = load_model('../../models/modelTest.keras')
 
         return model
     
+    @profile
     def drawHand(self, nodes):
         print("executando processo de desenho da mão...")
         edges = [[0, 1], 
@@ -313,7 +322,7 @@ class VideoCaptureThread(QThread):
         
         return "Image"
 
-    
+    @profile
     def calcular_distancia(self, ponto1, ponto2):
         print("executando processo de cálculo de distância...")
         return math.sqrt(((ponto2[0] - ponto1[0]) ** 2) + ((ponto2[1] - ponto1[1]) ** 2))
@@ -321,6 +330,7 @@ class VideoCaptureThread(QThread):
     
 class UI():
     print("Iniciando interface gráfica...")
+    @profile
     def __init__(self):
         super().__init__()
        # self.model = load_model('../../models/modelTest.keras')
@@ -339,8 +349,9 @@ class UI():
         self.label2 = QLabel("Mão", self.window)
 
         self.__windowBuild()
-
-    def __windowBuild(self):
+     
+    @profile
+    def __windowBuild(self): 
         print("Construindo interface gráfica...")
         self.window.setWindowTitle("Barium")
         self.window.setGeometry(100, 100, 700, 500)
@@ -393,26 +404,31 @@ class UI():
         self.video_thread.predictMove.connect(self.SetText)
         self.video_thread.handImage.connect(self.SetHand)
         self.video_thread.start()
-
+    
+     
     def __on_button_click(self):
         print("Encerrando aplicação...")
         self.app.quit()
-
+    
+    
     def SetVideo(self, frame):
         print("Exibindo vídeo...")
         max_width = 380
         self.label.setGeometry(20, 70, max_width, int(frame.height() / (frame.width()/max_width)))
         self.label.setPixmap(QPixmap.fromImage(frame))
-
+    
+    
     def SetText(self, texto):
         print("Exibindo texto...")
         self.Texto.setText(texto)
-
+    
+    
     def SetHand(self, img):
         print("Exibindo mão...")
         pixmap = QPixmap("../../img/mao.png")
-        self.label2.setPixmap(pixmap)
 
+        self.label2.setPixmap(pixmap)
+@profile
 def main():
     print("Iniciando aplicação...")
     ui = UI()

@@ -24,17 +24,17 @@ from PyQt5.QtCore import QTimer, QThread, Qt, QThread, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget, QApplication, QMainWindow, QLabel, QPushButton
 import networkx as nx
 import matplotlib.pyplot as plt
+import io
 
 class VideoCaptureThread(QThread):
     frameCaptured = pyqtSignal(QImage)
-    handImage = pyqtSignal(str)
+    handImage = pyqtSignal(QImage)
     predictMove = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
         self.cap = cv2.VideoCapture(0)
         self.mp_maos = mp.solutions.hands
-        self.maos = self.mp_maos.Hands(max_num_hands=1)
 
         self.model = self.load_model()
 
@@ -65,6 +65,9 @@ class VideoCaptureThread(QThread):
             self.frameCaptured.emit(qImg)
 
     def __getCoordinates(self, frame):
+
+        maos = self.mp_maos.Hands(max_num_hands=1)
+
         alpha = 2
         beta = 0
 
@@ -72,7 +75,7 @@ class VideoCaptureThread(QThread):
 
         x, y, w, h = 0, 0, 0, 0
         
-        resultados = self.maos.process(cv2.cvtColor(imagem, cv2.COLOR_BGR2RGB))
+        resultados = maos.process(cv2.cvtColor(imagem, cv2.COLOR_BGR2RGB))
 
         lista_pontos = []
 
@@ -101,9 +104,7 @@ class VideoCaptureThread(QThread):
         
         coordenadas = self.ProcessarCoordenadas(lista_pontos, x, y, w, h)
 
-        handImage = self.drawHand(coordenadas)
-        self.handImage.emit(handImage)
-
+        self.drawHand(coordenadas)
         
         self.tempo_atual = time.time() * 1000
 
@@ -134,6 +135,9 @@ class VideoCaptureThread(QThread):
                     self.video = []
         else:
             self.searchOrder(coordenadas)
+
+        if 'maos' in locals():
+            maos.close()
 
         return imagem
     
@@ -234,29 +238,11 @@ class VideoCaptureThread(QThread):
         return model
     
     def drawHand(self, nodes):
-        edges = [[0, 1], 
-        [1, 2], 
-        [2, 3], 
-        [3, 4], 
-        [0, 5], 
-        [5, 6], 
-        [6, 7], 
-        [7, 8], 
-        [0, 17], 
-        [5, 9], 
-        [9, 13], 
-        [13, 17], 
-        [9, 10], 
-        [10, 11], 
-        [11, 12], 
-        [13, 14], 
-        [14, 15], 
-        [15, 16], 
-        [17, 18],
-        [18, 19],
-        [19, 20]]
+        edges = [[0, 1], [1, 2], [2, 3], [3, 4], [0, 5], [5, 6],
+                 [6, 7], [7, 8], [0, 17], [5, 9], [9, 13], [13, 17],
+                 [9, 10], [10, 11], [11, 12], [13, 14],[14, 15],
+                 [15, 16], [17, 18],[18, 19],[19, 20]]
     
-
         image_mao = nx.DiGraph()
         
         pos = {}
@@ -271,10 +257,6 @@ class VideoCaptureThread(QThread):
         node_colors['pa'] = "#1e1e2e"
         node_colors['pb'] = "#1e1e2e"
 
-        max_x = max(nodes, key=lambda x: x[0])[0]
-        max_y = max(nodes, key=lambda x: x[1])[1]
-
-
         for i in range(21):
             image_mao.add_node(f'p{i}')
 
@@ -288,13 +270,21 @@ class VideoCaptureThread(QThread):
                     image_mao.add_edge(f'p{i}', f'p{j}')
 
 
+        buf = io.BytesIO()
         plt.figure(figsize=(10, 10))
         nx.draw(image_mao, pos, node_size=150, node_color=list(node_colors.values()), edge_color="#EE4740", arrows=False, with_labels=False)
-        # nx.draw(image_mao, pos, node_size=150, node_color="#007FFF", edge_color="#003566", arrows=False, with_labels=False)
-        plt.savefig("../../img/mao.png", transparent=True, dpi=300)
-        
-        return "Image"
+        nx.draw(image_mao, pos, node_size=150, node_color="#007FFF", edge_color="#003566", arrows=False, with_labels=False)
+        plt.savefig(buf, format='png', transparent=True, dpi=300)
+        buf.seek(0)
+        plt.close()
 
+        qimage = QImage()
+        qimage.loadFromData(buf.getvalue())
+
+        self.handImage.emit(qimage)
+        
+        if 'image_mao' in locals():
+            del image_mao
     
     def calcular_distancia(self, ponto1, ponto2):
         return math.sqrt(((ponto2[0] - ponto1[0]) ** 2) + ((ponto2[1] - ponto1[1]) ** 2))
@@ -384,8 +374,11 @@ class UI():
         self.Texto.setText(texto)
 
     def SetHand(self, img):
-        pixmap = QPixmap("../../img/mao.png")
-        self.label2.setPixmap(pixmap)
+        if isinstance(img, QImage):
+            pixmap = QPixmap.fromImage(img)
+            self.label2.setPixmap(pixmap)
+        else:
+            print("Tipo de imagem não suportado.")
 
 def main():
     ui = UI()

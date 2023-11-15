@@ -48,6 +48,11 @@ class VideoCaptureThread(QThread):
         self.movesAction = [ "FecharTelas", "PrintScreen", "AtivarModoMouseVirtual", "AumentarVolume", "IrParaCanalPredileto", "AbrirExploradorDeArquivos", "DiminuirVolume", "AumentarBrilho", "DiminuirBrilho", "AbrirNetflix", "AbrirDisneyPlus", "Confirmar"]
         self.controler = action()
 
+        self.mode_mouse = False
+        self.mouse = Mouse()
+
+        self.draw_hand_image = False
+
     def run(self):
         while True:
             sucesso, frame = self.cap.read()
@@ -104,7 +109,8 @@ class VideoCaptureThread(QThread):
         
         coordenadas = self.ProcessarCoordenadas(lista_pontos, x, y, w, h)
 
-        # self.drawHand(coordenadas)
+        if self.draw_hand_image:
+            self.drawHand(coordenadas)
         
         self.tempo_atual = time.time() * 1000
 
@@ -134,7 +140,10 @@ class VideoCaptureThread(QThread):
 
                     self.video = []
         else:
-            self.searchOrder(coordenadas)
+            if not self.mode_mouse:
+                self.searchOrder(coordenadas)
+            else:
+                self.mouse.mouse_virtual()
 
         if 'maos' in locals():
             maos.close()
@@ -199,7 +208,7 @@ class VideoCaptureThread(QThread):
         with open(os.devnull, 'w') as fnull:
             sys.stdout = fnull
             previsoes = self.model.predict(dados)
-            sys.stdout = sys.__stdout__ 
+            sys.stdout = sys.__stdout__
 
         self.moves = [
             'Fechar Telas',
@@ -230,7 +239,11 @@ class VideoCaptureThread(QThread):
         texto = "Movimento: " + self.moves[previsao] + " - " + str(previsoes_tratadas[previsao])
         self.predictMove.emit(texto)
 
-        self.functionExcecute(previsao)
+        if previsao != 2:
+            self.functionExcecute(previsao)
+        else: 
+            self.mode_mouse = True
+
         previsoes_tratadas = []
 
     def load_model(self):
@@ -312,6 +325,8 @@ class UI():
         self.Texto = QLabel("Movimento:",self.window)
         self.label2 = QLabel("Mão", self.window)
 
+        self.mode = "main"
+
         self.__windowBuild()
 
     def __windowBuild(self):
@@ -359,13 +374,14 @@ class UI():
         self.label2.setAlignment(QtCore.Qt.AlignCenter)
         self.label2.setScaledContents(True)
 
-        self.window.show()
-
+        self.window.show()    
+            
         self.video_thread = VideoCaptureThread()
         self.video_thread.frameCaptured.connect(self.SetVideo)
         self.video_thread.predictMove.connect(self.SetText)
         self.video_thread.handImage.connect(self.SetHand)
         self.video_thread.start()
+
 
     def __on_button_click(self):
         self.app.quit()
@@ -387,6 +403,7 @@ class UI():
 
 
 class action():
+
     def __init__(self):
         self.mouse = mouse.Mouse()
 
@@ -397,7 +414,7 @@ class action():
         pyautogui.hotkey('win', 'printscreen')
 
     def AtivarModoMouseVirtual(self):
-        self.mouse.mouse_virtual()
+        pass
 
     def AumentarVolume(self):
         devices = AudioUtilities.GetSpeakers()
@@ -459,9 +476,67 @@ class action():
         pass
 
 
+class Mouse():
+    frameCaptured = pyqtSignal(QImage)
+
+    def __init__(self):
+
+        self.video_thread = VideoCaptureThread()
+
+        self.video_thread = VideoCaptureThread()
+        self.video_thread.frameCaptured.connect(self.SetVideo)
+        self.video_thread.start()
+
+        self.sensitivity_factor = 1.5
+        self.list_hand_joints = []
+        self.calcular_distancia = self.video_thread.calcular_distancia()
+
+    def SetVideo(self, frame):
+        self.frameCaptured.emit(frame)
+
+    def mouse_virtual(self, resultados):
+        while True:
+            
+            self.list_hand_joints = []
+
+            if resultados.multi_hand_landmarks:
+                for handLms in resultados.multi_hand_landmarks:
+                    for id, lm in enumerate(handLms.landmark):
+                        h, w, _ = frame.shape
+                        cx, cy = int(lm.x * w), int(lm.y * h)
+
+                        self.list_hand_joints.append((cx, cy))
+
+                        if id == 8:
+                            pyautogui.moveTo(cx * self.sensitivity_factor, cy * self.sensitivity_factor)
+
+                    mp_drawing.draw_landmarks(frame, handLms, mp_hands.HAND_CONNECTIONS)
+
+            if self.list_hand_joints:
+                clickESegura = self.calcular_distancia(self.list_hand_joints[8], self.list_hand_joints[4])
+                clickBtnDireito = self.calcular_distancia(self.list_hand_joints[12], self.list_hand_joints[4])
+                clickSimples = self.calcular_distancia(self.list_hand_joints[20], self.list_hand_joints[4])
+
+                n1 = self.list_hand_joints[8][1] - self.list_hand_joints[7][1]
+                n2 = self.list_hand_joints[12][1] - self.list_hand_joints[11][1]
+                n3 = self.list_hand_joints[16][1] - self.list_hand_joints[15][1]
+
+                if clickESegura < 20:
+                    pyautogui.mouseDown()
+                else:
+                    pyautogui.mouseUp()
+
+                if clickSimples < 20:
+                    pyautogui.click()
+                if clickBtnDireito < 20:
+                    pyautogui.click(button='right')
+
+                if n1 > 0 and n2 > 0 and n3 > 0:
+                    print(n1, n2, n3)
+                    break
+
 def main():
     ui = UI()
     sys.exit(ui.app.exec_())
 
-if __name__ == "__main__":
-    main()
+main()

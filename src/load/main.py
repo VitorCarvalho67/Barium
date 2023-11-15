@@ -47,6 +47,9 @@ class VideoCaptureThread(QThread):
         self.intervalo_inicial = 500
 
         self.video = []
+        
+        self.movesAction = [ "FecharTelas", "PrintScreen", "AtivarModoMouseVirtual", "AumentarVolume", "IrParaCanalPredileto", "AbrirExploradorDeArquivos", "DiminuirVolume", "AumentarBrilho", "DiminuirBrilho", "AbrirNetflix", "AbrirDisneyPlus", "Confirmar"]
+        self.controler = action()
 
     def run(self):
         while True:
@@ -104,7 +107,7 @@ class VideoCaptureThread(QThread):
         
         coordenadas = self.ProcessarCoordenadas(lista_pontos, x, y, w, h)
 
-        self.drawHand(coordenadas)
+        # self.drawHand(coordenadas)
         
         self.tempo_atual = time.time() * 1000
 
@@ -230,6 +233,7 @@ class VideoCaptureThread(QThread):
         texto = "Movimento: " + self.moves[previsao] + " - " + str(previsoes_tratadas[previsao])
         self.predictMove.emit(texto)
 
+        self.functionExcecute(previsao)
         previsoes_tratadas = []
 
     def load_model(self):
@@ -288,7 +292,11 @@ class VideoCaptureThread(QThread):
     
     def calcular_distancia(self, ponto1, ponto2):
         return math.sqrt(((ponto2[0] - ponto1[0]) ** 2) + ((ponto2[1] - ponto1[1]) ** 2))
-
+    
+    def functionExcecute(self, function):
+        function = getattr(self.controler, self.movesAction[function])
+        function()
+        
     
 class UI():
     def __init__(self):
@@ -379,6 +387,84 @@ class UI():
             self.label2.setPixmap(pixmap)
         else:
             print("Tipo de imagem não suportado.")
+
+
+class action():
+    def __init__(self):
+        super().__init__()
+        # self.mouse = mouse.Mouse()
+        # self.mouse.start()
+
+    def FecharTelas(self):
+        pyautogui.hotkey('alt', 'f4')
+
+    def PrintScreen(self):
+        pyautogui.hotkey('win', 'printscreen')
+
+    def AtivarModoMouseVirtual(self):
+        self.mouse.stop()
+        self.mouse = mouse.Mouse()
+        self.mouse.start()
+
+    def AumentarVolume(self):
+        devices = AudioUtilities.GetSpeakers()
+        interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+        volume = cast(interface, POINTER(IAudioEndpointVolume))
+
+        current_volume = volume.GetMasterVolumeLevelScalar()
+        new_volume = min(1.0, current_volume + 0.1)
+        if new_volume > 1.:
+            volume.SetMasterVolumeLevelScalar(1., None)
+        else:
+            volume.SetMasterVolumeLevelScalar(new_volume, None)
+
+    def IrParaCanalPredileto(self):
+        pyautogui.hotkey('win', 's')
+        pyautogui.write('youtube')
+        time.sleep(2)
+        pyautogui.press('enter')
+
+    def AbrirExploradorDeArquivos(self):
+        pyautogui.hotkey('win', 'e')
+
+    def DiminuirVolume(self):
+        devices = AudioUtilities.GetSpeakers()
+        interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+        volume = cast(interface, POINTER(IAudioEndpointVolume))
+
+        current_volume = volume.GetMasterVolumeLevelScalar()
+        new_volume = min(1.0, current_volume - 0.1)
+        if new_volume < 0:
+            volume.SetMasterVolumeLevelScalar(0, None)
+        else:
+            volume.SetMasterVolumeLevelScalar(new_volume, None)
+
+    def AumentarBrilho(self):
+        pass
+
+    def DiminuirBrilho(self):
+        pass
+
+    def AbrirNetflix(self):
+        pyautogui.hotkey('win', 's')
+        pyautogui.write('chrome')
+        pyautogui.press('enter')
+        time.sleep(2)
+        pyautogui.write('netflix.com')
+        pyautogui.press('enter')
+
+
+    def AbrirDisneyPlus(self):
+        pyautogui.hotkey('win', 's')
+        pyautogui.write('chrome')
+        pyautogui.press('enter')
+        time.sleep(2)
+        pyautogui.write('disneyplus.com')
+        pyautogui.press('enter')
+
+    def Confirmar(self):
+        pass
+
 
 def main():
     ui = UI()

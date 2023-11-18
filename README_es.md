@@ -1,9 +1,8 @@
-
 <h4 align="center">
     <p>
-        <b>Inglés</b> |
+        <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_es">English</a> |
         <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_pt-br.md">Portugués</a> |
-        <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_pt-br.md">Español</a>
+        <b>Español</b>
     </p>
 </h4>
 

@@ -2,8 +2,10 @@
     <p>
         <b>English</b> |
         <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_pt-br.md">Рortuguês</a> |
-        <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_es.md">Español</a>
-    </p>
+        <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_es.md">Español</a>|
+       <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_ko.md">한국어</a> 
+       
+    
 </h4>
 
 <p align="center">
@@ -14,7 +16,7 @@
 
 An innovative software that utilizes neural networks, machine learning, and deep learning for tracking body movements, such as hands, enabling advanced interactions with the operating system, including predefined actions and a virtual mouse. Additionally, the project employs 4D neural network training techniques, where time is one of the dimensions, opening up revolutionary possibilities in various technology fields
 
-## [Português](https://github.com/VitorCarvalho67/Barium/blob/main/README_pt-br.md)
+
 
 
 ## How To Use

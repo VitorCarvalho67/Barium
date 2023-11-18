@@ -2,7 +2,9 @@
     <p>
         <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_pt-br.md">English</a> |
         <b>Portugués</b> |
-        <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_pt-br.md">Espanhol</b>
+        <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_pt-br.md">Espanhol</b> |
+         <c></c> 
+        <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_ko.md">스페인어</c>
     </p>
 </h4>
 

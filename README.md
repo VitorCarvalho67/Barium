@@ -15,7 +15,6 @@
 An innovative software that utilizes neural networks, machine learning, and deep learning for tracking body movements, such as hands, enabling advanced interactions with the operating system, including predefined actions and a virtual mouse. Additionally, the project employs 4D neural network training techniques, where time is one of the dimensions, opening up revolutionary possibilities in various technology fields
 
 
-#  🇧🇷 [Leia isto em Português](https://github.com/VitorCarvalho67/Barium/blob/main/README_pt-br.md)
 
 
 ## How To Use

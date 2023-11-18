@@ -1,3 +1,12 @@
+<h4 align="center">
+    <p>
+        <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_pt-br.md">English</a> |
+        <b>Portugués</b> |
+        <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_pt-br.md">Espanhol</b>
+    </p>
+</h4>
+
+
 <p align="center">
   <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/c3067279-4aee-4b25-851b-8ebe5fe9449d" />
 </p>

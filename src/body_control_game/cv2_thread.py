@@ -14,6 +14,8 @@ mp_pose = mp.solutions.pose
 
 BG_COLOR = (192, 192, 192)  # gray
 
+# teste commit
+
 
 class Cv2Thread(QThread):
     update_frame = Signal(QImage)

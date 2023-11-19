@@ -14,7 +14,6 @@
 
 Un innovador software que utiliza redes neuronales, aprendizaje automático y aprendizaje profundo para el seguimiento de movimientos corporales, como las manos, permitiendo interacciones avanzadas con el sistema operativo, incluyendo acciones predefinidas y un ratón virtual. Además, el proyecto emplea técnicas de entrenamiento de redes neuronales 4D, donde el tiempo es una de las dimensiones, abriendo posibilidades revolucionarias en diversos campos tecnológicos.
 
-## [Portugués](https://github.com/VitorCarvalho67/Barium/blob/main/README_pt-br.md)
 
 ## Cómo Usar
 Requisitos previos

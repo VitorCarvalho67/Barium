@@ -95,3 +95,12 @@ In the development process, we start with the creation of a data collection soft
 [Alvaro Richard]: https://github.com/alvarorichard
 [Daniel Alvarenga]: https://github.com/Daniel-Alvarenga
 [Vitor Carvalho]: https://github.com/VitorCarvalho67
+
+## License
+ The software is licensed under GPL-3.
+
+<p >
+  <img src="https://i.imgur.com/9kXfG6P.png" />
+</p>
+
+

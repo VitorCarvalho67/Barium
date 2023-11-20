@@ -388,7 +388,8 @@ class UI():
 
 class action():
     def __init__(self):
-        self.mouse = mouse.Mouse()
+        pass
+        # self.mouse = mouse.Mouse()
 
     def FecharTelas(self):
         pyautogui.hotkey('alt', 'f4')

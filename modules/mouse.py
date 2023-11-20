@@ -31,6 +31,7 @@ def mouse_virtual():
                 for id, lm in enumerate(handLms.landmark):
                     h, w, _ = frame.shape
                     cx, cy = int(lm.x * w), int(lm.y * h)
+                    print(cx, cy)
 
                     list_hand_joints.append((cx, cy))
 

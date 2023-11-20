@@ -18,10 +18,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import io
 
-projeto_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-sys.path.append(projeto_dir)
-from modules import mouse
-
+pyautogui.FAILSAFE = False
 
 class VideoCaptureThread(QThread):
     frameCaptured = pyqtSignal(QImage)
@@ -49,7 +46,6 @@ class VideoCaptureThread(QThread):
         self.controler = action()
 
         self.mode_mouse = False
-        self.mouse = Mouse()
 
         self.draw_hand_image = False
 
@@ -70,7 +66,7 @@ class VideoCaptureThread(QThread):
             self.frameCaptured.emit(qImg)
 
     def __getCoordinates(self, frame):
-
+        w, h, _ = frame.shape
         maos = self.mp_maos.Hands(max_num_hands=1)
 
         alpha = 2
@@ -143,12 +139,20 @@ class VideoCaptureThread(QThread):
             if not self.mode_mouse:
                 self.searchOrder(coordenadas)
             else:
-                self.mouse.mouse_virtual()
+                self.mouse_virtual(lista_pontos, w, h)
 
         if 'maos' in locals():
             maos.close()
 
         return imagem
+    
+    def mouse_virtual(self, lista_pontos, w, h):
+        sensitivity_factor = 1.5
+
+        if lista_pontos:
+            x, y = lista_pontos[8][0], lista_pontos[8][1]
+            pyautogui.moveTo(x * w * sensitivity_factor, y * h * sensitivity_factor, duration=0.1)
+            pyautogui.click(button='left')
     
     def ProcessarCoordenadas(self, lista_pontos, x, y, w, h):
         coordenadas = []
@@ -323,7 +327,7 @@ class UI():
         self.btn4 = QPushButton("Movimentos", self.window)
         self.btn5 = QPushButton("Jogos", self.window)
         self.Texto = QLabel("Movimento:",self.window)
-        self.label2 = QLabel("Mão", self.window)
+        self.label2 = QLabel("", self.window)
 
         self.mode = "main"
 
@@ -405,8 +409,8 @@ class UI():
 class action():
 
     def __init__(self):
-        self.mouse = mouse.Mouse()
-
+        pass
+    
     def FecharTelas(self):
         pyautogui.hotkey('alt', 'f4')
 
@@ -474,66 +478,6 @@ class action():
 
     def Confirmar(self):
         pass
-
-
-class Mouse():
-    frameCaptured = pyqtSignal(QImage)
-
-    def __init__(self):
-
-        self.video_thread = VideoCaptureThread()
-
-        self.video_thread = VideoCaptureThread()
-        self.video_thread.frameCaptured.connect(self.SetVideo)
-        self.video_thread.start()
-
-        self.sensitivity_factor = 1.5
-        self.list_hand_joints = []
-        self.calcular_distancia = self.video_thread.calcular_distancia()
-
-    def SetVideo(self, frame):
-        self.frameCaptured.emit(frame)
-
-    def mouse_virtual(self, resultados):
-        while True:
-            
-            self.list_hand_joints = []
-
-            if resultados.multi_hand_landmarks:
-                for handLms in resultados.multi_hand_landmarks:
-                    for id, lm in enumerate(handLms.landmark):
-                        h, w, _ = frame.shape
-                        cx, cy = int(lm.x * w), int(lm.y * h)
-
-                        self.list_hand_joints.append((cx, cy))
-
-                        if id == 8:
-                            pyautogui.moveTo(cx * self.sensitivity_factor, cy * self.sensitivity_factor)
-
-                    mp_drawing.draw_landmarks(frame, handLms, mp_hands.HAND_CONNECTIONS)
-
-            if self.list_hand_joints:
-                clickESegura = self.calcular_distancia(self.list_hand_joints[8], self.list_hand_joints[4])
-                clickBtnDireito = self.calcular_distancia(self.list_hand_joints[12], self.list_hand_joints[4])
-                clickSimples = self.calcular_distancia(self.list_hand_joints[20], self.list_hand_joints[4])
-
-                n1 = self.list_hand_joints[8][1] - self.list_hand_joints[7][1]
-                n2 = self.list_hand_joints[12][1] - self.list_hand_joints[11][1]
-                n3 = self.list_hand_joints[16][1] - self.list_hand_joints[15][1]
-
-                if clickESegura < 20:
-                    pyautogui.mouseDown()
-                else:
-                    pyautogui.mouseUp()
-
-                if clickSimples < 20:
-                    pyautogui.click()
-                if clickBtnDireito < 20:
-                    pyautogui.click(button='right')
-
-                if n1 > 0 and n2 > 0 and n3 > 0:
-                    print(n1, n2, n3)
-                    break
 
 def main():
     ui = UI()

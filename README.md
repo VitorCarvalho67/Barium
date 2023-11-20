@@ -1,13 +1,23 @@
+<h4 align="center">
+    <p>
+        <b>English</b> |
+        <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_pt-br.md">Рortuguês</a> |
+        <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_es.md">Español</a>|
+       <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_ko.md">한국어</a> 
+       
+    
+</h4>
 
 <p align="center">
   <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/c3067279-4aee-4b25-851b-8ebe5fe9449d" />
 </p>
 
-
-
 # Barium Human-Machine Interface (HMI)
 
 An innovative software that utilizes neural networks, machine learning, and deep learning for tracking body movements, such as hands, enabling advanced interactions with the operating system, including predefined actions and a virtual mouse. Additionally, the project employs 4D neural network training techniques, where time is one of the dimensions, opening up revolutionary possibilities in various technology fields
+
+
+
 
 ## How To Use
 Prerequisites
@@ -85,3 +95,12 @@ In the development process, we start with the creation of a data collection soft
 [Alvaro Richard]: https://github.com/alvarorichard
 [Daniel Alvarenga]: https://github.com/Daniel-Alvarenga
 [Vitor Carvalho]: https://github.com/VitorCarvalho67
+
+## License
+ The software is licensed under GPL-3.
+
+<p >
+  <img src="https://i.imgur.com/9kXfG6P.png" />
+</p>
+
+

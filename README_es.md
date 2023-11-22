@@ -91,3 +91,12 @@ En el proceso de desarrollo, comenzamos con la creación de un software de recol
 [Alvaro Richard]: https://github.com/alvarorichard
 [Daniel Alvarenga]: https://github.com/Daniel-Alvarenga
 [Vitor Carvalho]: https://github.com/VitorCarvalho67
+
+## Licencia
+El software está licenciado bajo GPL-3
+
+<p >
+  <img src="https://i.imgur.com/9kXfG6P.png" />
+</p>
+
+

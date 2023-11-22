@@ -88,3 +88,12 @@ python BariumMouse.py
 [Vitor Carvalho]: https://github.com/VitorCarvalho67
 
 
+## 라이선스
+ 소프트웨어는 GPL-3 하에 라이선스가 부여됩니다.
+
+<p >
+  <img src="https://i.imgur.com/9kXfG6P.png" />
+</p>
+
+
+

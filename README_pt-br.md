@@ -100,6 +100,15 @@ No processo de desenvolvimento, começamos com a criação de um software de col
 [Daniel Alvarenga]: https://github.com/Daniel-Alvarenga
 [Vitor Carvalho]: https://github.com/VitorCarvalho67
 
+## Licença
+ O software é licenciado sob a GPL-3.
+
+<p >
+  <img src="https://i.imgur.com/9kXfG6P.png" />
+</p>
+
+
+
 
 
 

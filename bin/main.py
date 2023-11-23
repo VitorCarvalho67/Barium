@@ -1,332 +1,266 @@
 import sys
 import os
-# projeto_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
-# sys.path.append(projeto_dir)
-# from modules import mouse
 import cv2
 import mediapipe as mp
 import math
 import numpy as np
-from PIL import Image, ImageDraw
 import time
-import datetime
-import pytz
-import pandas as pd
 from keras.models import load_model
 import pyautogui
 from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton
-from PyQt5.QtGui import QPixmap
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QTimer
-from PyQt5.QtGui import QImage, QPixmap
-from PyQt5.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget
+from PyQt5 import QtCore
+from PyQt5.QtGui import QPixmap, QImage, QIcon
+from PyQt5.QtCore import QThread, QThread, pyqtSignal
+from PyQt5.QtWidgets import QApplication, QLabel, QApplication, QMainWindow, QLabel, QPushButton
 import networkx as nx
 import matplotlib.pyplot as plt
+import io
 
-def on_button_click():
-    app.quit()
+pyautogui.FAILSAFE = False
 
-edges = [[0, 1], 
-        [1, 2], 
-        [2, 3], 
-        [3, 4], 
-        [0, 5], 
-        [5, 6], 
-        [6, 7], 
-        [7, 8], 
-        [0, 17], 
-        [5, 9], 
-        [9, 13], 
-        [13, 17], 
-        [9, 10], 
-        [10, 11], 
-        [11, 12], 
-        [13, 14], 
-        [14, 15], 
-        [15, 16], 
-        [17, 18],
-        [18, 19],
-        [19, 20]]
+class VideoCaptureThread(QThread):
+    frameCaptured = pyqtSignal(QImage)
+    handImage = pyqtSignal(QImage)
+    predictMove = pyqtSignal(str)
 
-app = QApplication(sys.argv)
-window = QMainWindow()
-window.setWindowTitle("Barium")
-window.setGeometry(100, 100, 700, 500)
-window.setFixedSize(700, 500)
-window.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-window.setWindowIcon(QIcon("../../img/LOGO.ico"))
-window.setStyleSheet("background-color: #1e1e2e;")
+    def __init__(self):
+        super().__init__()
+        self.cap = cv2.VideoCapture(0)
+        self.mp_maos = mp.solutions.hands
 
-central_widget = QLabel(window)
-central_widget.setPixmap(QPixmap("../../img/LogoApp.png").scaled(200, 40))
-central_widget.setGeometry(0, 0, 250, 80)
-central_widget.setAlignment(QtCore.Qt.AlignCenter)
+        self.model = self.load_model()
 
-button = QPushButton("", window)
-button.setStyleSheet("background-color: #077208; border-radius: 15px;")
-button.setGeometry(650, 20, 30, 30)
-button.clicked.connect(on_button_click, QtCore.Qt.UniqueConnection)
+        self.video_record_run = False
+        self.video_frame = -1
+        self.tempo_atual = 0
+        self.tempo_anterior = 0
 
-btn1 = QPushButton("Mouse", window)
-btn2 = QPushButton("Teclado", window)
-btn3 = QPushButton("Configurações", window)
-btn4 = QPushButton("Movimentos", window)
-btn5 = QPushButton("Jogos", window)
-Texto = QLabel("Movimento:",window)
-label = QLabel("Image", window)
-label2 = QLabel("Mão", window)
+        self.intervalo = 100
+        self.intervalo_inicial = 500
 
-Texto.setGeometry(20, 400, 200, 25)
-btn1.setGeometry(240, 400, 70, 25)
-btn2.setGeometry(320, 400, 70, 25)
-btn3.setGeometry(400, 400, 100, 25)
-btn4.setGeometry(510, 400, 100, 25)
-btn5.setGeometry(620, 400, 70, 25)
-label.setGeometry(0, 0, 0, 0)
-label2.setGeometry(0, 0, 0, 0)
+        self.video = []
+        
+        self.movesAction = [ "FecharTelas", "PrintScreen", "AtivarModoMouseVirtual", "AumentarVolume", "IrParaCanalPredileto", "AbrirExploradorDeArquivos", "DiminuirVolume", "AumentarBrilho", "DiminuirBrilho", "AbrirNetflix", "AbrirDisneyPlus", "Confirmar"]
+        self.controler = action()
 
-Texto.setStyleSheet("color: #CDD6F4; font-size: 14px;")
-btn1.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
-btn1.setGeometry(240, 400, 70, 25)
-btn1.clicked.connect(on_button_click)
+        self.mode_mouse = False
 
-btn2.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
-btn3.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
-btn4.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
-btn5.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
-label.setStyleSheet("border-radius: 10px; color: #CDD6F4; font-size: 14px; background-color: #1e1e5e;")
-label.setStyleSheet("border-radius: 10px; color: #CDD6F4; font-size: 14px; background-color: #1e1e5e;")
+        self.draw_hand_image = False
 
-label.setGeometry(20, 70, 350, 300)
-label.setAlignment(QtCore.Qt.AlignCenter)
-label.setScaledContents(True)
+    def run(self):
+        while True:
+            sucesso, frame = self.cap.read()
+            if not sucesso:
+                continue
 
-label2.setGeometry(430, 100, 240, 240)
-label2.setAlignment(QtCore.Qt.AlignCenter)
-label2.setScaledContents(True)
+            frame = cv2.flip(frame, 1)
 
-window.show()
+            frame = self.__getCoordinates(frame)
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-model = load_model("../../models/modelTest.keras")
+            height, width, channel = frame.shape
+            step = channel * width
+            qImg = QImage(frame.data, width, height, step, QImage.Format_RGB888)
+            self.frameCaptured.emit(qImg)
 
-salvar_videos = False
+    def __getCoordinates(self, frame):
+        w, h, _ = frame.shape
+        maos = self.mp_maos.Hands(max_num_hands=1)
 
-fusoHorario = pytz.timezone('America/Sao_Paulo')
-dia_atual = (datetime.datetime.now(fusoHorario)).strftime('%Y-%m-%d %H-%M-%S')
+        alpha = 2
+        beta = 0
 
-if salvar_videos:
-    diretorio = f"../video/video_{dia_atual}"
-    os.makedirs(diretorio)
+        imagem = cv2.convertScaleAbs(frame, alpha=alpha, beta=beta)
 
-intervalo = 100
-quantidade_de_frames = 20
+        x, y, w, h = 0, 0, 0, 0
+        
+        resultados = maos.process(cv2.cvtColor(imagem, cv2.COLOR_BGR2RGB))
 
-exibir_conexoes = False
-mostrar_numeros = False
-dataset = "../../data/test.csv"
+        lista_pontos = []
 
-def aumentar_contraste(frame):
+        if resultados.multi_hand_landmarks:
+            for pontos_mao in resultados.multi_hand_landmarks:
+                for idx, ponto in enumerate(pontos_mao.landmark):
+                    altura, largura, _ = frame.shape
+                    cx, cy = int(ponto.x * largura), int(ponto.y * altura)
+                    lista_pontos.append((cx, cy))
 
-    alpha = 2
-    beta = 0
+                if lista_pontos:
+                    x, y, w, h = cv2.boundingRect(np.array(lista_pontos))
+                    tamanho_max = max(w, h)
 
-    imagem = cv2.convertScaleAbs(frame, alpha=alpha, beta=beta)
+                    centro_x = x + w // 2
+                    centro_y = y + h // 2
 
-    return imagem
+                    x = centro_x - tamanho_max // 2
+                    y = centro_y - tamanho_max // 2
 
-def calcular_distancia(ponto1, ponto2):
-    return math.sqrt(((ponto2[0] - ponto1[0]) ** 2) + ((ponto2[1] - ponto1[1]) ** 2))
+                    x, y, w, h = x - 10, y - 10, tamanho_max + 20, tamanho_max + 20
 
-modo_mouse = False
+                    cv2.rectangle(imagem, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-cap = cv2.VideoCapture(0)
-mp_maos = mp.solutions.hands
-maos = mp_maos.Hands(max_num_hands=1)
+                mp.solutions.drawing_utils.draw_landmarks(imagem, pontos_mao, self.mp_maos.HAND_CONNECTIONS)
+        
+        coordenadas = self.ProcessarCoordenadas(lista_pontos, x, y, w, h)
 
-while True:
+        if self.draw_hand_image:
+            self.drawHand(coordenadas)
+        
+        self.tempo_atual = time.time() * 1000
 
-    ponto_anterior = None
-    matriz = None
+        if self.video_record_run == True:
+            if self.video_frame == 0:
+                if self.tempo_atual - self.tempo_anterior > self.intervalo_inicial:
+                    self.video.append(coordenadas)
+                    self.video_frame = 1
 
-    dados = []
-    numero = -1
-    iteracao = 0
+                    self.tempo_anterior = time.time() * 1000
 
-    matrizes = []
+            elif self.video_frame > 0 and self.video_frame < 20:
+                if self.tempo_atual - self.tempo_anterior > self.intervalo:
+                    self.video.append(coordenadas)
+                    self.video_frame += 1
 
-    z = 0
+                    self.tempo_anterior = time.time() * 1000
 
-    coordenadas = []
-    for a in range(21):
-        coordenadas.append([0, 0])
+            elif self.video_frame > 0 and self.video_frame == 20:
+                if self.tempo_atual - self.tempo_anterior > self.intervalo:
+                    self.video.append(coordenadas)
+                    self.video_frame = -1
+                    self.video_record_run = False
 
-    sucesso, frame = cap.read()
-    if not sucesso:
-        continue
+                    self.video = np.array(self.video)
+                    self.predict(self.video)
 
-    frame = cv2.flip(frame, 1)
+                    self.video = []
+        else:
+            if not self.mode_mouse:
+                self.searchOrder(coordenadas)
+            else:
+                self.mouse_virtual(lista_pontos, w, h)
 
-    resultados = maos.process(cv2.cvtColor(aumentar_contraste(frame), cv2.COLOR_BGR2RGB))
+        if 'maos' in locals():
+            maos.close()
 
-    lista_pontos = []
+        return imagem
+    
+    def mouse_virtual(self, lista_pontos, w, h):
+        sensitivity_factor = 1.5
 
-    if resultados.multi_hand_landmarks:
-        for pontos_mao in resultados.multi_hand_landmarks:
-            for idx, ponto in enumerate(pontos_mao.landmark):
-                altura, largura, _ = frame.shape
-                cx, cy = int(ponto.x * largura), int(ponto.y * altura)
-                if mostrar_numeros:
-                    cv2.putText(frame, str(idx), (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-                lista_pontos.append((cx, cy))
+        if lista_pontos:
+            x, y = lista_pontos[8][0], lista_pontos[8][1]
+            pyautogui.moveTo(x * w * sensitivity_factor, y * h * sensitivity_factor, duration=0.1)
+            pyautogui.click(button='left')
+    
+    def ProcessarCoordenadas(self, lista_pontos, x, y, w, h):
+        coordenadas = []
+        
+        self.a = 0
 
-            if lista_pontos:
-                x, y, w, h = cv2.boundingRect(np.array(lista_pontos))
-                tamanho_max = max(w, h)
-
-                centro_x = x + w // 2
-                centro_y = y + h // 2
-
-                x = centro_x - tamanho_max // 2
-                y = centro_y - tamanho_max // 2
-
-                x, y, w, h = x - 10, y - 10, tamanho_max + 20, tamanho_max + 20
-
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-            if exibir_conexoes:
-                mp.solutions.drawing_utils.draw_landmarks(frame, pontos_mao, mp_maos.HAND_CONNECTIONS)
-
-
-    if not numero == -1 and iteracao < 20:
-
-        pontos_ass = [] 
-
-        tempo_atual = time.time() * 1000
-
-        if tempo_atual - tempo_anterior >= intervalo or iteracao == 0:            
-            tempo_anterior = tempo_atual
-
-            matriz = np.full((100, 100), -1, dtype=int)
-            if lista_pontos:
-                for idx, ponto in enumerate(lista_pontos):
-                    y_rel = (ponto[1] - y) * 100 // h
-                    x_rel = (ponto[0] - x) * 100 // w
-                    valor = idx
-
-                    if(idx == 4 or idx == 8 or idx == 12 or idx == 16 or idx == 20):
-                        pontos_ass.append([x_rel, y_rel])
-
-                    matriz[y_rel][x_rel] = valor    
-
-            iteracao += 1
-
-    else:
-        if iteracao == 20:
-
-            dados.append(matrizes)
-            iteracao = -1
-            numero = -1
-            matrizes = []
-
-            valor_video = " "
-
-            if salvar_videos:
-                video.release()
-                valor_video += "e vídeo "
-            
-
-        nao_mexe_porque_assim_funciona = cv2.waitKey(1)
-
-        nodes = []
-
-        if len(lista_pontos) > 20:
-
-
-            pontos_ass = []
-
+        for self.a in range(21):
+            coordenadas.append([0, 0])
+        
+        matriz = np.full((100, 100), -1, dtype=int)
+        
+        if lista_pontos:
             for idx, ponto in enumerate(lista_pontos):
-
                 y_rel = (ponto[1] - y) * 100 // h
                 x_rel = (ponto[0] - x) * 100 // w
-                valor = idx
+            
+                matriz[y_rel][x_rel] = idx
 
-                if(idx == 4 or idx == 8 or idx == 12 or idx == 16 or idx == 20):
-                    pontos_ass.append([x_rel, y_rel])
-                
-                nodes.append([x_rel, y_rel])
-
-            factor = 25
-
-            p4 = pontos_ass[0]
-            p8 = pontos_ass[1]
-            p12 = pontos_ass[2]
-            p16 = pontos_ass[3]
-            p20 = pontos_ass[4]
-
-            d1 = calcular_distancia(p4, p8)
-            d2 = calcular_distancia(p8, p12)
-            d3 = calcular_distancia(p12, p16)
-            d4 = calcular_distancia(p16, p20)
-            d5 = calcular_distancia(p20, p4)
-
-
-            if (d1 < factor and d2 < factor and d3 < factor and d4 < factor and d5 < factor):
-                time.sleep(1)
-
-                tempo_anterior = time.time() * 1000
-                numero = 1
-
-                z += 1
-                print("Z: ",  z)
-
-    if matriz is not None:
         for linha in range(matriz.shape[0]):
             for coluna in range(matriz.shape[1]):
                 elemento = matriz[coluna, linha]
                 if elemento != -1:
                     coordenadas[elemento] = [linha, coluna]
-        
-        foto = Image.new("RGB", (100, 100), "black")
 
-        draw = ImageDraw.Draw(foto)
+        return coordenadas
 
-        for indice, (x,y) in enumerate(coordenadas):
-            draw.text((x,y), str("."), fill="white")
+    def searchOrder(self, coordenadas):
+        pontos_ass = []
 
-        foto = np.array(foto)
-        foto = cv2.resize(foto, (100, 100))
-        
-        if salvar_videos:
-            video.write(foto)
+        zeros = True
 
-        matriz = None
-        diagonal = calcular_distancia((x, y), (x + w, y + h))
-        referencial = ((x + w, y + h))
+        for idx, ponto in enumerate(coordenadas):
+            if [ponto[1], ponto[1]] != [0, 0]:
+                zeros = False
+            if(idx == 4 or idx == 8 or idx == 12 or idx == 16 or idx == 20):
+                pontos_ass.append([ponto[1], ponto[1]])
+            
+        factor = 25
 
-        linha = []
+        ds = []
 
-        for [x, y] in coordenadas:
-            linha.append([x, y])
-        
+        for i in range(len(pontos_ass)):
+            if i == 4:
+                ds.append(self.calcular_distancia(pontos_ass[0], pontos_ass[i]))
+            else:
+                ds.append(self.calcular_distancia(pontos_ass[i], pontos_ass[i + 1]))
 
-        matrizes.append(linha)
-
-    frame = cv2.cvtColor(aumentar_contraste(frame), cv2.COLOR_BGR2RGB)
-    height_frame, width_frame, channels = frame.shape
-    step = channels * width_frame
-    qImg = QImage(frame.data, width_frame, height_frame, step, QImage.Format_RGB888)
+        if not zeros:
+            if (ds[0] < factor and ds[1] < factor and ds[2] < factor and ds[3] < factor and ds[4] < factor):
+                self.video_record_run = True
+                self.video_frame = 1
+                self.tempo_anterior = time.time() * 1000
     
-    max_width = 380
+    def predict(self, dados):
+        dados = (dados).reshape((1, 840))
+    
+        with open(os.devnull, 'w') as fnull:
+            sys.stdout = fnull
+            previsoes = self.model.predict(dados)
+            sys.stdout = sys.__stdout__
 
-    label.setGeometry(20, 70, max_width, int(height_frame / (width_frame/max_width)))
-    label.setPixmap(QPixmap.fromImage(qImg))
+        self.moves = [
+            'Fechar Telas',
+            'Print screen',
+            'Ativar modo mouse virtual',
+            'Aumentar o volume',
+            'Ir para o canal predileto',
+            'Abrir o explorador de arquivos',
+            'Diminuir o volume',
+            'Aumentar o brilho',
+            'Diminuir o brilho',
+            'Abrir a netflix',
+            'Abrir o disney plus',
+            'Confirmar'
+        ]
 
-    if len(nodes) > 20:
+        previsoes_tratadas = []
+        maior = 0
 
+        for i, previsao in enumerate(previsoes[0]):
+            if previsao > previsoes[0][maior]:
+                maior = i
+
+            previsoes_tratadas.append(f"{previsao * 100:.2f}%")
+        
+        previsao = np.argmax(previsoes)
+        
+        texto = "Movimento: " + self.moves[previsao] + " - " + str(previsoes_tratadas[previsao])
+        self.predictMove.emit(texto)
+
+        if previsao != 2:
+            self.functionExcecute(previsao)
+        else: 
+            self.mode_mouse = True
+
+        previsoes_tratadas = []
+
+    def load_model(self):
+        model = load_model('./model.keras')
+
+        return model
+    
+    def drawHand(self, nodes):
+        edges = [[0, 1], [1, 2], [2, 3], [3, 4], [0, 5], [5, 6],
+                 [6, 7], [7, 8], [0, 17], [5, 9], [9, 13], [13, 17],
+                 [9, 10], [10, 11], [11, 12], [13, 14],[14, 15],
+                 [15, 16], [17, 18],[18, 19],[19, 20]]
+    
         image_mao = nx.DiGraph()
         
         pos = {}
@@ -341,9 +275,6 @@ while True:
         node_colors['pa'] = "#1e1e2e"
         node_colors['pb'] = "#1e1e2e"
 
-        max_x = max(nodes, key=lambda x: x[0])[0]
-        max_y = max(nodes, key=lambda x: x[1])[1]
-
         for i in range(21):
             image_mao.add_node(f'p{i}')
 
@@ -356,62 +287,200 @@ while True:
                 if [i, j] in edges:
                     image_mao.add_edge(f'p{i}', f'p{j}')
 
+
+        buf = io.BytesIO()
         plt.figure(figsize=(10, 10))
         nx.draw(image_mao, pos, node_size=150, node_color=list(node_colors.values()), edge_color="#EE4740", arrows=False, with_labels=False)
-        # nx.draw(image_mao, pos, node_size=150, node_color="#007FFF", edge_color="#003566", arrows=False, with_labels=False)
-        plt.savefig("mao.png", transparent=True, dpi=300)
+        nx.draw(image_mao, pos, node_size=150, node_color="#007FFF", edge_color="#003566", arrows=False, with_labels=False)
+        plt.savefig(buf, format='png', transparent=True, dpi=300)
+        buf.seek(0)
+        plt.close()
 
-        pixmap = pixmap = QPixmap("mao.png")
-        label2.setPixmap(pixmap)
+        qimage = QImage()
+        qimage.loadFromData(buf.getvalue())
 
-    if iteracao == -1:
-        iteracao = 0
-
-        dados = np.array(dados)
-
-        video = (dados).reshape((1, 840))
-
-        previsoes = model.predict(video)
-
-        movimentos = [
-                    'Fechar Telas',
-                    'Print screen',
-                    'Ativar modo mouse virtual',
-                    'Aumentar o volume',
-                    'Ir para o canal predileto',
-                    'Abrir o explorador de arquivos',
-                    'Diminuir o volume',
-                    'Aumentar o brilho',
-                    'Diminuir o brilho',
-                    'Abrir a netflix',
-                    'Abrir o disney plus',
-                    'Confirmar'
-                    ]
+        self.handImage.emit(qimage)
         
-        max_move = max(len(x) for x in movimentos)
-
-        previsoes_tratadas = []
-
-        maior = 0
-
-        for i, previsao in enumerate(previsoes[0]):
-            if previsao > previsoes[0][maior]:
-                maior = i
-
-            previsoes_tratadas.append(f"{previsao * 100:.2f}%")
-
-        max_pred = max(len(x) for x in previsoes_tratadas)
-
-        previsao = np.argmax(previsoes)
+        if 'image_mao' in locals():
+            del image_mao
+    
+    def calcular_distancia(self, ponto1, ponto2):
+        return math.sqrt(((ponto2[0] - ponto1[0]) ** 2) + ((ponto2[1] - ponto1[1]) ** 2))
+    
+    def functionExcecute(self, function):
+        function = getattr(self.controler, self.movesAction[function])
+        function()
         
-        texto = "Movimento: " + movimentos[previsao] + " - " + str(previsoes_tratadas[previsao])
+    
+class UI():
+    def __init__(self):
+        super().__init__()
+        self.app = QApplication(sys.argv)
+        self.window = QMainWindow()
+        self.central_widget = QLabel(self.window)
+        self.button = QPushButton("", self.window)
+        self.label = QLabel(self.window)
+
+        self.btn1 = QPushButton("Mouse", self.window)
+        self.btn2 = QPushButton("Teclado", self.window)
+        self.btn3 = QPushButton("Configurações", self.window)
+        self.btn4 = QPushButton("Movimentos", self.window)
+        self.btn5 = QPushButton("Jogos", self.window)
+        self.Texto = QLabel("Movimento:",self.window)
+        self.label2 = QLabel("", self.window)
+
+        self.mode = "main"
+
+        self.__windowBuild()
+
+    def __windowBuild(self):
+        self.window.setWindowTitle("Barium")
+        self.window.setGeometry(100, 100, 700, 500)
+        self.window.setFixedSize(700, 500)
+        self.window.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        self.window.setWindowIcon(QIcon("../../img/LOGO.ico"))
+        self.window.setStyleSheet("background-color: #1e1e2e;")
+
+        self.central_widget.setPixmap(QPixmap("../../img/LogoApp.png").scaled(200, 40))
+        self.central_widget.setGeometry(0, 0, 250, 80)
+        self.central_widget.setAlignment(QtCore.Qt.AlignCenter)
+
+        self.button.setStyleSheet("background-color: #077208; border-radius: 15px;")
+        self.button.setGeometry(650, 20, 30, 30)
+        self.button.clicked.connect(self.__on_button_click, QtCore.Qt.UniqueConnection)
+
+        self.Texto.setGeometry(20, 400, 200, 25)
+        self.btn1.setGeometry(240, 400, 70, 25)
+        self.btn2.setGeometry(320, 400, 70, 25)
+        self.btn3.setGeometry(400, 400, 100, 25)
+        self.btn4.setGeometry(510, 400, 100, 25)
+        self.btn5.setGeometry(620, 400, 70, 25)
+        self.label.setGeometry(0, 0, 0, 0)
+        self.label2.setGeometry(0, 0, 0, 0)
+
+        self.Texto.setStyleSheet("color: #CDD6F4; font-size: 14px;")
+        self.btn1.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
+        self.btn1.setGeometry(240, 400, 70, 25)
+        self.btn1.clicked.connect(self.__on_button_click)
+
+        self.btn2.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
+        self.btn3.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
+        self.btn4.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
+        self.btn5.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
+        self.label.setStyleSheet("border-radius: 10px; color: #CDD6F4; font-size: 14px; background-color: #1e1e5e;")
+        self.label.setStyleSheet("border-radius: 10px; color: #CDD6F4; font-size: 14px; background-color: #1e1e5e;")
+
+        self.label.setGeometry(20, 70, 350, 300)
+        self.label.setAlignment(QtCore.Qt.AlignCenter)
+        self.label.setScaledContents(True)
         
-        Texto.setText(texto)
+        self.label2.setGeometry(430, 100, 240, 240)
+        self.label2.setAlignment(QtCore.Qt.AlignCenter)
+        self.label2.setScaledContents(True)
 
-    input_v = 1
+        self.window.show()    
+            
+        self.video_thread = VideoCaptureThread()
+        self.video_thread.frameCaptured.connect(self.SetVideo)
+        self.video_thread.predictMove.connect(self.SetText)
+        self.video_thread.handImage.connect(self.SetHand)
+        self.video_thread.start()
 
-    if input_v == '0':
-        exit
 
-        cap.release()
-        cv2.destroyAllWindows()
+    def __on_button_click(self):
+        self.app.quit()
+
+    def SetVideo(self, frame):
+        max_width = 380
+        self.label.setGeometry(20, 70, max_width, int(frame.height() / (frame.width()/max_width)))
+        self.label.setPixmap(QPixmap.fromImage(frame))
+
+    def SetText(self, texto):
+        self.Texto.setText(texto)
+
+    def SetHand(self, img):
+        if isinstance(img, QImage):
+            pixmap = QPixmap.fromImage(img)
+            self.label2.setPixmap(pixmap)
+        else:
+            print("Tipo de imagem não suportado.")
+
+
+class action():
+
+    def __init__(self):
+        pass
+    
+    def FecharTelas(self):
+        pyautogui.hotkey('alt', 'f4')
+
+    def PrintScreen(self):
+        pyautogui.hotkey('win', 'printscreen')
+
+    def AtivarModoMouseVirtual(self):
+        pass
+
+    def AumentarVolume(self):
+        devices = AudioUtilities.GetSpeakers()
+        interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+        volume = cast(interface, POINTER(IAudioEndpointVolume))
+
+        current_volume = volume.GetMasterVolumeLevelScalar()
+        new_volume = min(1.0, current_volume + 0.1)
+        if new_volume > 1.:
+            volume.SetMasterVolumeLevelScalar(1., None)
+        else:
+            volume.SetMasterVolumeLevelScalar(new_volume, None)
+
+    def IrParaCanalPredileto(self):
+        pyautogui.hotkey('win', 's')
+        pyautogui.write('youtube')
+        time.sleep(2)
+        pyautogui.press('enter')
+
+    def AbrirExploradorDeArquivos(self):
+        pyautogui.hotkey('win', 'e')
+
+    def DiminuirVolume(self):
+        devices = AudioUtilities.GetSpeakers()
+        interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+        volume = cast(interface, POINTER(IAudioEndpointVolume))
+
+        current_volume = volume.GetMasterVolumeLevelScalar()
+        new_volume = min(1.0, current_volume - 0.1)
+        if new_volume < 0:
+            volume.SetMasterVolumeLevelScalar(0, None)
+        else:
+            volume.SetMasterVolumeLevelScalar(new_volume, None)
+
+    def AumentarBrilho(self):
+        pass
+
+    def DiminuirBrilho(self):
+        pass
+
+    def AbrirNetflix(self):
+        pyautogui.hotkey('win', 's')
+        pyautogui.write('chrome')
+        pyautogui.press('enter')
+        time.sleep(2)
+        pyautogui.write('netflix.com')
+        pyautogui.press('enter')
+
+
+    def AbrirDisneyPlus(self):
+        pyautogui.hotkey('win', 's')
+        pyautogui.write('chrome')
+        pyautogui.press('enter')
+        time.sleep(2)
+        pyautogui.write('disneyplus.com')
+        pyautogui.press('enter')
+
+    def Confirmar(self):
+        pass
+
+def main():
+    ui = UI()
+    sys.exit(ui.app.exec_())
+
+main()

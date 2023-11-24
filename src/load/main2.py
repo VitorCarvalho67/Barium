@@ -17,6 +17,7 @@ from PyQt5.QtWidgets import QApplication, QLabel, QApplication, QMainWindow, QLa
 import networkx as nx
 import matplotlib.pyplot as plt
 import io
+import subprocess
 
 pyautogui.FAILSAFE = False
 
@@ -378,6 +379,8 @@ class UI():
         self.label2.setAlignment(QtCore.Qt.AlignCenter)
         self.label2.setScaledContents(True)
 
+        self.btn5.clicked.connect(self.game)
+
         self.window.show()    
             
         self.video_thread = VideoCaptureThread()
@@ -404,6 +407,14 @@ class UI():
             self.label2.setPixmap(pixmap)
         else:
             print("Tipo de imagem não suportado.")
+
+    def game(self):
+        game_script_path = "../body_control_game/window.py"
+        
+        full_path = os.path.join(os.path.dirname(__file__), game_script_path)
+        subprocess.Popen(["python", full_path], shell=True)
+        sys.exit()
+
 
 
 class action():

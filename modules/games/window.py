@@ -246,11 +246,17 @@ class Window(QMainWindow):
         self.add_controls_mode_combobox(log_layout)
         self.add_controls_combobox(log_layout)
 
+        # Add logo do Barium
+        self.logo_label = QLabel(self)
+        self.logo_label.setPixmap(QPixmap("../../img/LOGO.png"))
+        self.logo_label.setFixedSize(200, 200)
+        self.logo_label.move(10, 10)
+
         # Add state label
         self.state_label = QLabel(self)
         self.state_label.setStyleSheet("color: #CDD6F4; font-size: 14px;")
-        self.state_label.setMinimumSize(550, 500)
-        self.state_label.setMaximumSize(550, 1000)
+        self.state_label.setFixedSize(200, 200)
+        self.state_label.move(10, 220)
         self.state_label.setWordWrap(True)
         
         # Main layout

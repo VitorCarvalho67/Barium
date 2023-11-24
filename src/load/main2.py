@@ -380,6 +380,7 @@ class UI():
         self.label2.setScaledContents(True)
 
         self.btn5.clicked.connect(self.game)
+        self.btn1.clicked.connect(self.mouse)
 
         self.window.show()    
             
@@ -409,12 +410,18 @@ class UI():
             print("Tipo de imagem não suportado.")
 
     def game(self):
-        game_script_path = "../body_control_game/window.py"
+        game_script_path = "../../modules/games/window.py"
         
         full_path = os.path.join(os.path.dirname(__file__), game_script_path)
         subprocess.Popen(["python", full_path], shell=True)
         sys.exit()
 
+    def mouse(self):
+        mouse_script_path = "../cam-mouse/__init__.py"
+
+        full_path = os.path.join(os.path.dirname(__file__), mouse_script_path)
+        subprocess.Popen(["python", full_path], shell=True)
+        sys.exit()
 
 
 class action():
@@ -429,7 +436,12 @@ class action():
         pyautogui.hotkey('win', 'printscreen')
 
     def AtivarModoMouseVirtual(self):
-        pass
+        mouse_script_path = "../../cam-mouse/__init__.py"
+
+        full_path = os.path.join(os.path.dirname(__file__), mouse_script_path)
+        subprocess.Popen(["python", full_path], shell=True)
+        sys.exit()
+
 
     def AumentarVolume(self):
         devices = AudioUtilities.GetSpeakers()

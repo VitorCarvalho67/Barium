@@ -1,6 +1,7 @@
 import sys
 from PySide6.QtCore import Qt, Slot
-from PySide6.QtGui import QImage, QPixmap
+from PyQt5 import QtCore
+from PySide6.QtGui import QImage, QPixmap, QIcon
 from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
@@ -27,8 +28,10 @@ mp_config = dict(
 )
 
 body_modes = [
-    "Action",
-    "Driving",
+    # "Action",
+    # "Driving",
+    'Ação',
+    'Dirigindo'
 ]
 
 # Config for body processor
@@ -147,7 +150,8 @@ events_config = dict(
 
 inputs = [
     dict(
-        name="Min detection confidence",
+        # name="Min detection confidence",
+        name="Mínimo de confiança de detecção",
         key="min_detection_confidence",
         type="mp",
         input="slider_percentage",
@@ -157,7 +161,8 @@ inputs = [
         hidden=True,
     ),
     dict(
-        name="Min detection confidence",
+        # name="Min detection confidence",
+        name="Mínimo de confiança de detecção",
         key="min_tracking_confidence",
         type="mp",
         input="slider_percentage",
@@ -167,7 +172,8 @@ inputs = [
         hidden=True,
     ),
     dict(
-        name="Model complexity",
+        # name="Model complexity",
+        name="Complexidade do modelo",
         key="model_complexity",
         type="mp",
         input="slider",
@@ -177,15 +183,24 @@ inputs = [
         hidden=True,
     ),
     dict(
-        name="Show segmentation", key="enable_segmentation", type="mp", input="checkbox"
-    ),
-    dict(name="Show angles", key="draw_angles", type="body", input="checkbox"),
-    dict(name="Show body coords", key="show_coords", type="body", input="checkbox"),
-    dict(
-        name="Enable keyboard", key="keyboard_enabled", type="events", input="checkbox"
+        # name="Show segmentation", key="enable_segmentation", type="mp", input="checkbox"
+        name="Mostrar segmentação", key="enable_segmentation", type="mp", input="checkbox"
     ),
     dict(
-        name="Use cross command to toggle keyboard",
+        # name="Show angles", key="draw_angles", type="body", input="checkbox"
+        name="Mostrar ângulos", key="draw_angles", type="body", input="checkbox"
+        ),
+    dict(
+        # name="Show body coords", key="show_coords", type="body", input="checkbox"
+        name="Mostrar coordenadas do corpo", key="show_coords", type="body", input="checkbox"
+        ),
+    dict(
+        # name="Enable keyboard", key="keyboard_enabled", type="events", input="checkbox"
+        name="Habilitar teclado", key="keyboard_enabled", type="events", input="checkbox"
+    ),
+    dict(
+        # name="Use cross command to toggle keyboard",
+        name="Usar comando cruz para alternar teclado",
         key="cross_cmd_enabled",
         type="events",
         input="checkbox",
@@ -197,9 +212,15 @@ class Window(QMainWindow):
     def __init__(self):
         super().__init__()
         # Title and dimensions
-        self.setWindowTitle("Pose Detection")
-        self.setGeometry(100, 100, 900, 650)
-
+        self.setWindowTitle("Barium")
+        self.setGeometry(300, 300, 1000, 500)
+        # tamanho fixo
+        self.setFixedSize(1000, 500)
+        
+        self.setStyleSheet("background-color: #1e1e2e;")
+        self.setWindowIconText("color: #fffff")
+        self.setWindowIcon(QIcon("../../img/LOGO.ico"))
+        
         # Create a label for the display camera
         self.camera_label = QLabel(self)
         self.camera_label.setFixedSize(IMAGE_WIDTH, IMAGE_HEIGHT)
@@ -227,11 +248,11 @@ class Window(QMainWindow):
 
         # Add state label
         self.state_label = QLabel(self)
+        self.state_label.setStyleSheet("color: #CDD6F4; font-size: 14px;")
         self.state_label.setMinimumSize(550, 500)
         self.state_label.setMaximumSize(550, 1000)
         self.state_label.setWordWrap(True)
-        log_layout.addWidget(self.state_label)
-
+        
         # Main layout
         layout = QHBoxLayout()
         layout.addWidget(self.camera_label)
@@ -313,6 +334,7 @@ class Window(QMainWindow):
         elif _type == "events":
             checked = Qt.Checked if events_config[key] else Qt.Unchecked
         _checkbox.setCheckState(checked)
+        _checkbox.setStyleSheet("color: #CDD6F4; font-size: 14px;")
 
         _checkbox.stateChanged.connect(
             lambda value: self.checkbox_state_changed(key, value, _type)
@@ -330,13 +352,19 @@ class Window(QMainWindow):
     def add_controls_combobox(self, layout):
         controls_row = QFormLayout()
 
+        container_widget = QWidget()
+        container_widget.setStyleSheet("color: #CDD6F4; font-size: 14px;")
+        
         controls_combobox = QComboBox()
+        controls_combobox.setStyleSheet("color: #CDD6F4; font-size: 14px; background-color: #1e1e2e; border: 1px solid #CDD6F4;")
         controls_combobox.setMaximumSize(150, 100)
         controls_combobox.addItems(list(map(lambda i: i["name"], controls_list)))
         controls_combobox.currentIndexChanged.connect(self.controls_combobox_change)
 
-        controls_row.addRow("Control", controls_combobox)
-        layout.addLayout(controls_row)
+        # controls_row.addRow("Control", controls_combobox)
+        controls_row.addRow("Controle", controls_combobox)
+        container_widget.setLayout(controls_row)
+        layout.addWidget(container_widget)
 
     def controls_combobox_change(self, index):
         self.cv2_thread.body.events.command_key_mappings = controls_list[index][
@@ -352,15 +380,21 @@ class Window(QMainWindow):
     def add_controls_mode_combobox(self, layout):
         controls_row = QFormLayout()
 
+        container_widget = QWidget()
+        container_widget.setStyleSheet("color: #CDD6F4; font-size: 14px;")
+
         controls_mode_combobox = QComboBox()
+        controls_mode_combobox.setStyleSheet("color: #CDD6F4; font-size: 14px; background-color: #1e1e2e; border: 1px solid #CDD6F4;")
         controls_mode_combobox.setMaximumSize(150, 100)
         controls_mode_combobox.addItems(body_modes)
         controls_mode_combobox.currentIndexChanged.connect(
             self.controls_mode_combobox_change
         )
 
-        controls_row.addRow("Mode", controls_mode_combobox)
-        layout.addLayout(controls_row)
+        # controls_row.addRow("Mode", controls_mode_combobox)
+        controls_row.addRow("Modo", controls_mode_combobox)
+        container_widget.setLayout(controls_row)
+        layout.addWidget(container_widget)
 
     def controls_mode_combobox_change(self, index):
         self.cv2_thread.body.mode = body_modes[index]

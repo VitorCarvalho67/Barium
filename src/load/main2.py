@@ -46,9 +46,7 @@ class VideoCaptureThread(QThread):
         self.movesAction = [ "FecharTelas", "PrintScreen", "AtivarModoMouseVirtual", "AumentarVolume", "IrParaCanalPredileto", "AbrirExploradorDeArquivos", "DiminuirVolume", "AumentarBrilho", "DiminuirBrilho", "AbrirNetflix", "AbrirDisneyPlus", "Confirmar"]
         self.controler = action()
 
-        self.mode_mouse = False
-
-        self.draw_hand_image = False
+        self.draw_hand_image = True
 
     def run(self):
         while True:
@@ -137,23 +135,13 @@ class VideoCaptureThread(QThread):
 
                     self.video = []
         else:
-            if not self.mode_mouse:
-                self.searchOrder(coordenadas)
-            else:
-                self.mouse_virtual(lista_pontos, w, h)
+            self.searchOrder(coordenadas)
+            
 
         if 'maos' in locals():
             maos.close()
 
         return imagem
-    
-    def mouse_virtual(self, lista_pontos, w, h):
-        sensitivity_factor = 1.5
-
-        if lista_pontos:
-            x, y = lista_pontos[8][0], lista_pontos[8][1]
-            pyautogui.moveTo(x * w * sensitivity_factor, y * h * sensitivity_factor, duration=0.1)
-            pyautogui.click(button='left')
     
     def ProcessarCoordenadas(self, lista_pontos, x, y, w, h):
         coordenadas = []
@@ -244,10 +232,8 @@ class VideoCaptureThread(QThread):
         texto = "Movimento: " + self.moves[previsao] + " - " + str(previsoes_tratadas[previsao])
         self.predictMove.emit(texto)
 
-        if previsao != 2:
+        if previsao:
             self.functionExcecute(previsao)
-        else: 
-            self.mode_mouse = True
 
         previsoes_tratadas = []
 
@@ -430,7 +416,7 @@ class action():
         pass
     
     def FecharTelas(self):
-        pyautogui.hotkey('alt', 'f4')
+        pyautogui.hotkey('win', 'd')
 
     def PrintScreen(self):
         pyautogui.hotkey('win', 'printscreen')

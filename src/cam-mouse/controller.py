@@ -1,6 +1,5 @@
 import pyautogui
 
-
 class GestureManager:
     def __init__(self):
         self.screen_width, self.screen_height = pyautogui.size()
@@ -82,12 +81,16 @@ class GestureManager:
         scrolling_up =  self.little_finger_up and self.index_finger_down and self.middle_finger_down and self.ring_finger_down
         if scrolling_up:
             pyautogui.scroll(120)
+            self.summary.emit("Rolando para cima")
+
             # print("Scrolling UP")
             # mandar para a Gui o texto em portugues "Rolando para cima"
 
         scrolling_down = self.index_finger_up and self.middle_finger_down and self.ring_finger_down and self.little_finger_down
         if scrolling_down:
             pyautogui.scroll(-120)
+            self.summary.emit("Rolando para baixo")
+
             # print("Scrolling DOWN")
             # mandar para a Gui o texto em portugues "Rolando para baixo"
     
@@ -103,6 +106,9 @@ class GestureManager:
             pyautogui.keyDown('ctrl')
             pyautogui.scroll(-50)
             pyautogui.keyUp('ctrl')
+
+            self.summary.emit("Diminuindo Zoom")
+
             # print("Zooming Out")
             # mandar para a Gui o texto em portugues "Diminuindo Zoom" no label da Gui no ARQUIVO __init__.py
             
@@ -112,6 +118,8 @@ class GestureManager:
             pyautogui.keyDown('ctrl')
             pyautogui.scroll(50)
             pyautogui.keyUp('ctrl')
+            self.summary.emit("Diminuindo Zoom")
+
             # print("Zooming In")
             # mandar para a Gui o texto em portugues "Aumentando Zoom"
 
@@ -121,6 +129,9 @@ class GestureManager:
         if not self.left_clicked and left_click_condition:
             pyautogui.click()
             self.left_clicked = True
+            self.summary.emit("Clicando com o botão esquerdo")
+
+
             # print("Left Clicking")
             # mandar para a Gui o texto em portugues "Clicando com o botao esquerdo"
         elif not self.index_finger_within_Thumb_finger:
@@ -130,6 +141,9 @@ class GestureManager:
         if not self.right_clicked and right_click_condition:
             pyautogui.rightClick()
             self.right_clicked = True
+            self.summary.emit("Clicando com o botão direito")
+
+
             # print("Right Clicking")
             # mandar para a Gui o texto em portugues "Clicando com o botao direito"
         elif not self.middle_finger_within_Thumb_finger:
@@ -139,6 +153,8 @@ class GestureManager:
         if not self.double_clicked and  double_click_condition:
             pyautogui.doubleClick()
             self.double_clicked = True
+            self.summary.emit("Clicando duas vezes")
+
             # print("Double Clicking")
             # mandar para a Gui o texto em portugues "Clicando duas vezes"
         elif not self.ring_finger_within_Thumb_finger:
@@ -148,6 +164,8 @@ class GestureManager:
         if not self.dragging and self.all_fingers_down:
             pyautogui.mouseDown(button = "left")
             self.dragging = True
+            self.summary.emit("Arrastando")
+            
             # print("Dragging")
             # mandar para a Gui o texto em portugues "Arrastando"
         elif not self.all_fingers_down:

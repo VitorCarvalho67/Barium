@@ -67,9 +67,7 @@ python BariumMouse.py
 El software ahora debería estar activo, y puedes interactuar con tu computadora usando gestos con las manos.
 
 ## Desarrollar
-
-En el proceso de desarrollo, comenzamos con la creación de un software de recolección de datos para construir nuestro conjunto de datos personalizado. Luego, avanzamos en el desarrollo de una red neuronal, utilizando aprendizaje profundo y redes neuronales convolucionales (CNN). Finalmente, creamos un software que emplea esta red para reconocer movimientos en tiempo real y ejecutar acciones correspondientes.
-
+En el proceso de desarrollo, comenzamos con la creación de un software de recolección de datos para construir nuestro conjunto de datos personalizado. A continuación, pasamos al desarrollo de una red neuronal, utilizando aprendizaje profundo y redes neuronales convolucionales (CNN). Finalmente, creamos un software que emplea esta red para reconocer movimientos en tiempo real y ejecutar acciones correspondientes. Para obtener información más detallada sobre el desarrollo de Barium, por favor, lea la [Guía del Desarrollador][Dev]. 
 ## Conjunto de Datos
 
 <p align="center">
@@ -100,3 +98,4 @@ El software está licenciado bajo GPL-3
 </p>
 
 
+[dev]:DEV.md  

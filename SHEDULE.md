@@ -19,5 +19,4 @@
 
 # Documentação:
 
-- [ ] Arrumar os READMEs;
 - [ ] Terminar o paper;

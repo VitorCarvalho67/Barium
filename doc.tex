@@ -78,6 +78,24 @@ Labeling and annotating our dataset was carried out with the following methodolo
 
 This approach allows the entire dataset to be submitted for training and testing of the neural network in a single file, ensuring flexibility and ease in data handling. The simplicity of data ingestion contrasts with the abstract complexity of the dataset's structure and its labeling. A single file containing a complete dataset for computational video vision, in numerical format, represents a significant advancement and provides an efficient alternative for neural network training.
 
+\subsection{Neural Network Input}
+
+The input to our neural networks is designed to capture the complexity and dynamics of human gestures. The 840-parameter input vector is a flattened representation of the data, where each Cartesian point captured from the gestures is transformed into a linear numerical sequence. This allows the neural network to process video data efficiently, learning temporal and spatial patterns of gestures. Converting data points into a flattened format is crucial for reducing data dimensionality, which can help to speed up training without compromising the recognition capacity for complex patterns.
+
+\subsection{Optimization and Model Validation}
+
+To ensure the efficiency and efficacy of the neural network, we adopted a rigorous approach to optimization and validation. We used techniques such as cross-validation and hyperparameter tuning to find the ideal configuration that provides the best accuracy without falling into the trap of overfitting. Moreover, we employed regularization and dropout techniques to better generalize our model. Validation is performed with an independent test dataset, ensuring that the model can generalize well to data not seen during training.
+
+\subsection{Neural Network Diagram}
+
+% The actual drawing of the neural network diagram in LaTeX can be quite complex and is beyond the scope of this example.
+% Below is a placeholder for where you would include your TikZ code for the diagram.
+
+
+
+
+\end{document}
+
 \section{Conclusion}
 "Barium" stands as a significant milestone in human-computer interaction. The successful integration of neural networks and hand-tracking technologies not only demonstrates the technical feasibility of such innovations but also opens new avenues for intuitive and accessible interfaces. The project extends its impact beyond technology, influencing fields like education, healthcare, and entertainment.
 

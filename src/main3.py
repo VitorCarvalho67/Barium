@@ -130,18 +130,7 @@ class VideoCaptureThread(QThread):
             elif not self.mode_mouse:
                 self.searchOrder(coordenadas)
             else:
-                self.status = True
-                with self.mp_hands.Hands(**self.mp_config) as hands:
-                    while self.status:
-                        if results.multi_hand_landmarks:
-                            if len(results.multi_hand_landmarks) == 1:
-                                self.hand_Landmarks = results.multi_hand_landmarks[0]
-                            self.update_fingers_status()
-                            self.cursor_moving()
-                            self.detect_scrolling()
-                            self.detect_zoomming()
-                            self.detect_clicking()
-                            self.detect_dragging()
+                self.mouse(results)
 
     def __getCoordinates(self, frame):
         w, h, _ = frame.shape
@@ -263,6 +252,21 @@ class VideoCaptureThread(QThread):
             'Confirmar'
         ]
 
+        self.descricoes = [
+            'Fechando Telas',
+            'Tirando print screen',
+            'Ativando modo mouse virtual',
+            'Aumentando o volume',
+            'Indo para canal predileto',
+            'Abrindo o explorador de arquivos',
+            'Diminuindo o volume',
+            'Aumentando o brilho',
+            'Diminuindo o brilho',
+            'Abrindo a Netflix',
+            'Abrindo Disney Plus',
+            'Confirmando'
+        ]
+
         previsoes_tratadas = []
         maior = 0
 
@@ -274,7 +278,7 @@ class VideoCaptureThread(QThread):
         
         previsao = np.argmax(previsoes)
         
-        texto = "Movimento: " + self.moves[previsao] + " - " + str(previsoes_tratadas[previsao])
+        texto = self.descricoes[previsao] + "... - " + str(previsoes_tratadas[previsao])
         self.summary.emit(texto)
         self.last_summary = time.time() * 1000
 
@@ -346,6 +350,167 @@ class VideoCaptureThread(QThread):
     def functionExcecute(self, function):
         function = getattr(self.controler, self.movesAction[function])
         function()
+
+    def mouse(self, results):
+        if results.multi_hand_landmarks:
+            if len(results.multi_hand_landmarks) == 1:
+                self.hand_Landmarks = results.multi_hand_landmarks[0]
+            self.update_fingers_status()
+            self.cursor_moving()
+            self.detect_scrolling()
+            self.detect_zoomming()
+            self.detect_clicking()
+            self.detect_dragging()
+            self.detect_exit()
+
+    def update_fingers_status(self):
+        finger_tips = [20, 8, 12, 16, 4]
+        knuckles = [17, 5, 9, 13, 13]
+
+        finger_names = ['little_finger', 'index_finger', 'middle_finger', 'ring_finger', 'Thump_finger']
+
+        for finger_tip, knuckle, finger_name in zip(finger_tips, knuckles, finger_names):
+            setattr(self, f'{finger_name}_down', getattr(self.hand_Landmarks.landmark[finger_tip], 'y') > getattr(self.hand_Landmarks.landmark[knuckle], 'y'))
+            setattr(self, f'{finger_name}_up', getattr(self.hand_Landmarks.landmark[finger_tip], 'y') < getattr(self.hand_Landmarks.landmark[knuckle], 'y'))
+
+        print(self.little_finger_down, self.index_finger_down, self.middle_finger_down, self.ring_finger_down, self.Thump_finger_down)
+
+        self.little_finger_down = self.hand_Landmarks.landmark[20].y > self.hand_Landmarks.landmark[17].y
+        self.little_finger_up = self.hand_Landmarks.landmark[20].y < self.hand_Landmarks.landmark[17].y
+        self.index_finger_down = self.hand_Landmarks.landmark[8].y > self.hand_Landmarks.landmark[5].y
+        self.index_finger_up = self.hand_Landmarks.landmark[8].y < self.hand_Landmarks.landmark[5].y
+        self.middle_finger_down = self.hand_Landmarks.landmark[12].y > self.hand_Landmarks.landmark[9].y
+        self.middle_finger_up = self.hand_Landmarks.landmark[12].y < self.hand_Landmarks.landmark[9].y
+        self.ring_finger_down = self.hand_Landmarks.landmark[16].y > self.hand_Landmarks.landmark[13].y
+        self.ring_finger_up = self.hand_Landmarks.landmark[16].y < self.hand_Landmarks.landmark[13].y
+        self.Thump_finger_down = self.hand_Landmarks.landmark[4].y > self.hand_Landmarks.landmark[13].y
+        self.Thump_finger_up = self.hand_Landmarks.landmark[4].y < self.hand_Landmarks.landmark[13].y
+
+        print(self.little_finger_down, self.index_finger_down, self.middle_finger_down, self.ring_finger_down, self.Thump_finger_down)
+
+        self.all_fingers_down = self.index_finger_down and self.middle_finger_down and self.ring_finger_down and self.little_finger_down
+        self.all_fingers_up = self.index_finger_up and self.middle_finger_up and self.ring_finger_up and self.little_finger_up
+        self.index_finger_within_Thumb_finger = self.hand_Landmarks.landmark[8].y > self.hand_Landmarks.landmark[4].y and self.hand_Landmarks.landmark[8].y < self.hand_Landmarks.landmark[2].y
+        self.middle_finger_within_Thumb_finger = self.hand_Landmarks.landmark[12].y > self.hand_Landmarks.landmark[4].y and self.hand_Landmarks.landmark[12].y < self.hand_Landmarks.landmark[2].y
+        self.little_finger_within_Thumb_finger = self.hand_Landmarks.landmark[20].y > self.hand_Landmarks.landmark[4].y and self.hand_Landmarks.landmark[20].y < self.hand_Landmarks.landmark[2].y
+        self.ring_finger_within_Thumb_finger = self.hand_Landmarks.landmark[16].y > self.hand_Landmarks.landmark[4].y and self.hand_Landmarks.landmark[16].y < self.hand_Landmarks.landmark[2].y
+
+    def get_position(self, hand_x_position, hand_y_position):
+        old_x, old_y = pyautogui.position()
+        current_x = int(hand_x_position * self.screen_width)
+        current_y = int(hand_y_position * self.screen_height)
+
+        ratio = 1
+        self.prev_hand = (current_x, current_y) if self.prev_hand is None else self.prev_hand
+        delta_x = current_x - self.prev_hand[0]
+        delta_y = current_y - self.prev_hand[1]
+        
+        self.prev_hand = [current_x, current_y]
+        current_x , current_y = old_x + delta_x * ratio , old_y + delta_y * ratio
+
+        threshold = 5
+        if current_x < threshold:
+            current_x = threshold
+        elif current_x > self.screen_width - threshold:
+            current_x = self.screen_width - threshold
+        if current_y < threshold:
+            current_y = threshold
+        elif current_y > self.screen_height - threshold:
+            current_y = self.screen_height - threshold
+
+        return (current_x,current_y)
+    
+    def cursor_moving(self):
+        point = 9
+        current_x, current_y = self.hand_Landmarks.landmark[point].x ,self.hand_Landmarks.landmark[point].y
+        x, y = self.get_position(current_x, current_y)
+        cursor_freezed = self.all_fingers_up and self.Thump_finger_down
+        if not cursor_freezed:
+            pyautogui.moveTo(x, y, duration = 0)
+
+    def detect_scrolling(self):
+        scrolling_up =  self.little_finger_up and self.index_finger_down and self.middle_finger_down and self.ring_finger_down
+        if scrolling_up:
+            pyautogui.scroll(120)
+            self.summary.emit("Rolando para cima...")
+            self.last_summary = time.time() * 1000
+
+        scrolling_down = self.index_finger_up and self.middle_finger_down and self.ring_finger_down and self.little_finger_down
+        if scrolling_down:
+            pyautogui.scroll(-120)
+            self.summary.emit("Rolando para baixo...")
+            self.last_summary = time.time() * 1000
+
+    def detect_zoomming(self):
+        zoomming = self.index_finger_up and self.middle_finger_up and self.ring_finger_down and self.little_finger_down
+        window = .05
+        index_touches_middle = abs(self.hand_Landmarks.landmark[8].x - self.hand_Landmarks.landmark[12].x) <= window
+        zoomming_out = zoomming and index_touches_middle
+        zoomming_in = zoomming and not index_touches_middle
+        
+        if zoomming_out:
+            pyautogui.keyDown('ctrl')
+            pyautogui.scroll(-50)
+            pyautogui.keyUp('ctrl')
+
+            self.summary.emit("Diminuindo Zoom...")
+            self.last_summary = time.time() * 1000
+
+        if zoomming_in:
+            pyautogui.keyDown('ctrl')
+            pyautogui.scroll(50)
+            pyautogui.keyUp('ctrl')
+            self.summary.emit("Aumentando Zoom...")
+            self.last_summary = time.time() * 1000
+
+    def detect_clicking(self):
+        left_click_condition = self.index_finger_within_Thumb_finger and self.middle_finger_up and self.ring_finger_up and self.little_finger_up and not self.middle_finger_within_Thumb_finger and not self.ring_finger_within_Thumb_finger and not self.little_finger_within_Thumb_finger
+        if not self.left_clicked and left_click_condition:
+            pyautogui.click()
+            self.left_clicked = True
+            self.summary.emit("Clicando com o botão esquerdo...")
+            self.last_summary = time.time() * 1000
+        elif not self.index_finger_within_Thumb_finger:
+            self.left_clicked = False
+
+        right_click_condition = self.middle_finger_within_Thumb_finger and self.index_finger_up and self.ring_finger_up and self.little_finger_up and not self.index_finger_within_Thumb_finger and not self.ring_finger_within_Thumb_finger and not self.little_finger_within_Thumb_finger
+        if not self.right_clicked and right_click_condition:
+            pyautogui.rightClick()
+            self.right_clicked = True
+            self.summary.emit("Clicando com o botão direito...")
+            self.last_summary = time.time() * 1000
+        elif not self.middle_finger_within_Thumb_finger:
+            self.right_clicked = False
+
+        double_click_condition = self.ring_finger_within_Thumb_finger and self.index_finger_up and self.middle_finger_up and self.little_finger_up and not self.index_finger_within_Thumb_finger and not self.middle_finger_within_Thumb_finger and not self.little_finger_within_Thumb_finger
+        if not self.double_clicked and  double_click_condition:
+            pyautogui.doubleClick()
+            self.double_clicked = True
+            self.summary.emit("Clicando duas vezes...")
+            self.last_summary = time.time() * 1000
+        elif not self.ring_finger_within_Thumb_finger:
+            self.double_clicked = False
+    
+    def detect_dragging(self):
+        if not self.dragging and self.all_fingers_down:
+            pyautogui.mouseDown(button = "left")
+            self.dragging = True
+            self.summary.emit("Arrastando...")
+            self.last_summary = time.time() * 1000
+        elif not self.all_fingers_down:
+            pyautogui.mouseUp(button = "left")
+            self.dragging = False
+
+    def detect_exit(self):
+        if self.little_finger_within_Thumb_finger and self.index_finger_up and self.middle_finger_up and self.ring_finger_up and not self.index_finger_within_Thumb_finger and not self.middle_finger_within_Thumb_finger and not self.ring_finger_within_Thumb_finger:
+            self.stopMouseMode()
+            
+    def stopMouseMode(self):
+        self.summary.emit("Saindo do modo mouse...")
+        self.last_summary = time.time() * 1000
+
+        self.mode_mouse = False
+
         
     
 class UI():
@@ -448,166 +613,6 @@ class UI():
         full_path = os.path.join(os.path.dirname(__file__), game_script_path)
         subprocess.Popen(["python", full_path], shell=True)
         sys.exit()
-
-    def update_fingers_status(self):
-        self.little_finger_down = self.hand_Landmarks.landmark[20].y > self.hand_Landmarks.landmark[17].y
-        self.little_finger_up = self.hand_Landmarks.landmark[20].y < self.hand_Landmarks.landmark[17].y
-        self.index_finger_down = self.hand_Landmarks.landmark[8].y > self.hand_Landmarks.landmark[5].y
-        self.index_finger_up = self.hand_Landmarks.landmark[8].y < self.hand_Landmarks.landmark[5].y
-        self.middle_finger_down = self.hand_Landmarks.landmark[12].y > self.hand_Landmarks.landmark[9].y
-        self.middle_finger_up = self.hand_Landmarks.landmark[12].y < self.hand_Landmarks.landmark[9].y
-        self.ring_finger_down = self.hand_Landmarks.landmark[16].y > self.hand_Landmarks.landmark[13].y
-        self.ring_finger_up = self.hand_Landmarks.landmark[16].y < self.hand_Landmarks.landmark[13].y
-        self.Thump_finger_down = self.hand_Landmarks.landmark[4].y > self.hand_Landmarks.landmark[13].y
-        self.Thump_finger_up = self.hand_Landmarks.landmark[4].y < self.hand_Landmarks.landmark[13].y
-        self.all_fingers_down = self.index_finger_down and self.middle_finger_down and self.ring_finger_down and self.little_finger_down
-        self.all_fingers_up = self.index_finger_up and self.middle_finger_up and self.ring_finger_up and self.little_finger_up
-        self.index_finger_within_Thumb_finger = self.hand_Landmarks.landmark[8].y > self.hand_Landmarks.landmark[4].y and self.hand_Landmarks.landmark[8].y < self.hand_Landmarks.landmark[2].y
-        self.middle_finger_within_Thumb_finger = self.hand_Landmarks.landmark[12].y > self.hand_Landmarks.landmark[4].y and self.hand_Landmarks.landmark[12].y < self.hand_Landmarks.landmark[2].y
-        self.little_finger_within_Thumb_finger = self.hand_Landmarks.landmark[20].y > self.hand_Landmarks.landmark[4].y and self.hand_Landmarks.landmark[20].y < self.hand_Landmarks.landmark[2].y
-        self.ring_finger_within_Thumb_finger = self.hand_Landmarks.landmark[16].y > self.hand_Landmarks.landmark[4].y and self.hand_Landmarks.landmark[16].y < self.hand_Landmarks.landmark[2].y
-
-    def get_position(self, hand_x_position, hand_y_position):
-        old_x, old_y = pyautogui.position()
-        current_x = int(hand_x_position * self.screen_width)
-        current_y = int(hand_y_position * self.screen_height)
-
-        ratio = 1
-        self.prev_hand = (current_x, current_y) if self.prev_hand is None else self.prev_hand
-        delta_x = current_x - self.prev_hand[0]
-        delta_y = current_y - self.prev_hand[1]
-        
-        self.prev_hand = [current_x, current_y]
-        current_x , current_y = old_x + delta_x * ratio , old_y + delta_y * ratio
-
-        threshold = 5
-        if current_x < threshold:
-            current_x = threshold
-        elif current_x > self.screen_width - threshold:
-            current_x = self.screen_width - threshold
-        if current_y < threshold:
-            current_y = threshold
-        elif current_y > self.screen_height - threshold:
-            current_y = self.screen_height - threshold
-
-        return (current_x,current_y)
-    
-    def cursor_moving(self):
-        point = 9
-        current_x, current_y = self.hand_Landmarks.landmark[point].x ,self.hand_Landmarks.landmark[point].y
-        x, y = self.get_position(current_x, current_y)
-        cursor_freezed = self.all_fingers_up and self.Thump_finger_down
-        if not cursor_freezed:
-            pyautogui.moveTo(x, y, duration = 0)
-
-    def detect_scrolling(self):
-        scrolling_up =  self.little_finger_up and self.index_finger_down and self.middle_finger_down and self.ring_finger_down
-        if scrolling_up:
-            pyautogui.scroll(120)
-            self.summary.emit("Rolando para cima")
-            self.last_summary = time.time() * 1000
-
-
-            # print("Scrolling UP")
-            # mandar para a Gui o texto em portugues "Rolando para cima"
-
-        scrolling_down = self.index_finger_up and self.middle_finger_down and self.ring_finger_down and self.little_finger_down
-        if scrolling_down:
-            pyautogui.scroll(-120)
-            self.summary.emit("Rolando para baixo")
-            self.last_summary = time.time() * 1000
-
-
-            # print("Scrolling DOWN")
-            # mandar para a Gui o texto em portugues "Rolando para baixo"
-    
-
-    def detect_zoomming(self):
-        zoomming = self.index_finger_up and self.middle_finger_up and self.ring_finger_down and self.little_finger_down
-        window = .05
-        index_touches_middle = abs(self.hand_Landmarks.landmark[8].x - self.hand_Landmarks.landmark[12].x) <= window
-        zoomming_out = zoomming and index_touches_middle
-        zoomming_in = zoomming and not index_touches_middle
-        
-        if zoomming_out:
-            pyautogui.keyDown('ctrl')
-            pyautogui.scroll(-50)
-            pyautogui.keyUp('ctrl')
-
-            self.summary.emit("Diminuindo Zoom")
-            self.last_summary = time.time() * 1000
-
-
-            # print("Zooming Out")
-            # mandar para a Gui o texto em portugues "Diminuindo Zoom" no label da Gui no ARQUIVO __init__.py
-            
-
-
-        if zoomming_in:
-            pyautogui.keyDown('ctrl')
-            pyautogui.scroll(50)
-            pyautogui.keyUp('ctrl')
-            self.summary.emit("Aumentando Zoom")
-            self.last_summary = time.time() * 1000
-
-
-            # print("Zooming In")
-            # mandar para a Gui o texto em portugues "Aumentando Zoom"
-
-
-    def detect_clicking(self):
-        left_click_condition = self.index_finger_within_Thumb_finger and self.middle_finger_up and self.ring_finger_up and self.little_finger_up and not self.middle_finger_within_Thumb_finger and not self.ring_finger_within_Thumb_finger and not self.little_finger_within_Thumb_finger
-        if not self.left_clicked and left_click_condition:
-            pyautogui.click()
-            self.left_clicked = True
-            self.summary.emit("Clicando com o botão esquerdo")
-            self.last_summary = time.time() * 1000
-
-            # print("Left Clicking")
-            # mandar para a Gui o texto em portugues "Clicando com o botao esquerdo"
-        elif not self.index_finger_within_Thumb_finger:
-            self.left_clicked = False
-
-        right_click_condition = self.middle_finger_within_Thumb_finger and self.index_finger_up and self.ring_finger_up and self.little_finger_up and not self.index_finger_within_Thumb_finger and not self.ring_finger_within_Thumb_finger and not self.little_finger_within_Thumb_finger
-        if not self.right_clicked and right_click_condition:
-            pyautogui.rightClick()
-            self.right_clicked = True
-            self.summary.emit("Clicando com o botão direito")
-            self.last_summary = time.time() * 1000
-
-            # print("Right Clicking")
-            # mandar para a Gui o texto em portugues "Clicando com o botao direito"
-        elif not self.middle_finger_within_Thumb_finger:
-            self.right_clicked = False
-
-        double_click_condition = self.ring_finger_within_Thumb_finger and self.index_finger_up and self.middle_finger_up and self.little_finger_up and not self.index_finger_within_Thumb_finger and not self.middle_finger_within_Thumb_finger and not self.little_finger_within_Thumb_finger
-        if not self.double_clicked and  double_click_condition:
-            pyautogui.doubleClick()
-            self.double_clicked = True
-            self.summary.emit("Clicando duas vezes")
-            self.last_summary = time.time() * 1000
-
-            # print("Double Clicking")
-            # mandar para a Gui o texto em portugues "Clicando duas vezes"
-        elif not self.ring_finger_within_Thumb_finger:
-            self.double_clicked = False
-    
-    def detect_dragging(self):
-        if not self.dragging and self.all_fingers_down:
-            pyautogui.mouseDown(button = "left")
-            self.dragging = True
-            self.summary.emit("Arrastando")
-            self.last_summary = time.time() * 1000
-            
-            # print("Dragging")
-            # mandar para a Gui o texto em portugues "Arrastando"
-        elif not self.all_fingers_down:
-            pyautogui.mouseUp(button = "left")
-            self.dragging = False
-
-    def stop(self):
-        self.status = False
-
 
 class action():
 

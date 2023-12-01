@@ -17,29 +17,25 @@
 \bigskip % Espaçamento extra após a linha
 
 \begin{center}
-   \begin{tabular}{p{0.3\textwidth}p{0.3\textwidth}p{0.3\textwidth}}
-        \centering \textbf{Daniel R. Alvarenga*} & \centering \textbf{Alvaro Richard*} & \centering \textbf{Vitor Eduardo S. de Carvalho*} \tabularnewline
-        \centering \href{mailto:danielralvs@proton.me}{danielralvs@proton.me} & \centering \href{mailto:alvarorichards@proton.me}{alvaro10048@proton.me} & \centering \href{mailto:srcarvalhox@proton.me}{srcarvalhox@proton.me} \tabularnewline
+    \begin{tabular}{p{0.3\textwidth}p{0.3\textwidth}p{0.3\textwidth}}
+    \centering \textbf{Daniel R. Alvarenga*} & \centering \textbf{Alvaro Richard*} & \centering \textbf{Vitor Eduardo S. de Carvalho*} \tabularnewline
+    \centering \href{mailto:danielralvs@proton.me}{danielralvs@proton.me} & \centering \href{mailto:alvarorichard@proton.me}{alvarorichard@proton.me} & \centering \href{mailto:vitorcarvalho@proton.me}{vitorcarvalho@proton.me} \tabularnewline
     \end{tabular}
 \end{center}
 
-\bigskip % Espaçamento extra após os autores
+\begin{center}
+    \begin{tabular}{p{0.3\textwidth}}
+    \centering \textbf{Robson Cardoso*} \tabularnewline
+    \centering \href{mailto:robsoncardoso@proton.me}{robsoncardoso@proton.me} \tabularnewline
+    \end{tabular}
+\end{center}
+\bigskip
 
 \begin{abstract}
 The "Barium" project emerges as a pioneering endeavor in the realm of Human-Machine Interfaces (HMI), harnessing the prowess of neural networks, machine learning, and deep learning to track and interpret human body movements, notably hand gestures. This paper delineates the development and application of a 4D neural network training approach, where time is regarded as a crucial dimension, heralding groundbreaking prospects in diverse technological domains. Developed in Python, Barium activates through webcam-captured hand gestures, facilitating user interactions with operating systems via predefined actions and a virtual mouse.
 \end{abstract}
 
 % Início da seção dos modelos de rede neural
-
-% \section{Modelos de Rede Neural}
-% Para o desenvolvimento deste projeto, foram elaborados dois modelos avançados de rede neural. O primeiro modelo emprega camadas de convolução tridimensional (Conv3D), que são excepcionalmente adequadas para o processamento de dados de vídeo, devido à sua capacidade de capturar características tanto espaciais quanto temporais. O segundo modelo, de natureza sequencial, é focado em otimizar a performance. Este modelo incorpora o cerne científico do projeto, demonstrando uma abordagem inovadora e eficiente no processamento e análise de dados em vídeo.
-
-% \subsection{Modelo Conv3D (Modelo Convencional)}
-% O Modelo Conv3D, projetado especificamente para o processamento de objetos tridimensionais, destaca-se por sua eficácia em vídeos, assemelhando-se aos modelos de Redes Neurais Recorrentes (RNN) em termos de desempenho. Contudo, sua aplicabilidade é limitada devido à exigência de um processamento computacional intensivo. A seguir, apresentamos uma visão detalhada deste modelo, incluindo a estrutura de suas camadas, as funções de ativação utilizadas e o número de neurônios em cada segmento:
-
-
-% \subsection{Modelo Flatten (Modelo Eficiente)}
-% O Modelo Flatten representa um marco revolucionário na área de processamento de vídeo. Este modelo sequencial, notável por sua eficiência e rapidez, se destaca pela maneira inovadora com que coleta e processa dados. A arquitetura de suas camadas em rede neural é projetada para maximizar a eficiência, permitindo aos usuários reconfigurar e retreinar a rede em questão de segundos para incorporar novos movimentos. Esta capacidade de adaptação rápida é um grande avanço, tornando o Modelo Flatten uma ferramenta poderosa para aplicações dinâmicas e em tempo real.
 
 \section{Neural Network Models}
 For the development of this project, two advanced neural network models were elaborated. The first model employs three-dimensional convolution layers (Conv3D), which are exceptionally suitable for processing video data, owing to their ability to capture both spatial and temporal characteristics. The second model, of a sequential nature, is focused on optimizing performance. This model incorporates the scientific core of the project, demonstrating an innovative and efficient approach in the processing and analysis of video data.
@@ -50,7 +46,55 @@ The Conv3D Model, specifically designed for the processing of three-dimensional 
 \subsection{Flatten Model (Efficient Model)}
 The Flatten Model represents a revolutionary milestone in the field of video processing. This sequential model, notable for its efficiency and speed, stands out for the innovative way it collects and processes data. The architecture of its neural network layers is designed to maximize efficiency, allowing users to reconfigure and retrain the network in a matter of seconds to incorporate new movements. This ability for rapid adaptation is a significant advancement, making the Flatten Model a powerful tool for dynamic and real-time applications.
 
-% Fim da seção dos modelos de rede neural
+\section{Dataset Construction}
+
+The construction of a robust and representative dataset played a crucial role in the development of "Barium". This dataset is not only the backbone of the system but also the key to its authenticity and operational freedom. The efficacy of the project's neural network, which is responsible for the precise processing and interpretation of gestures, immensely depends on the quality and variety of the collected data.
+
+\subsection{Creation of the Collector}
+
+\textbf{Gesture Capture and Processing:} We developed a collector using a Python script to record movements and translate them into a numerical format. This allows for consistent representations of gestures to be encoded accurately.
+
+\textbf{Video Feature Extraction:} By decomposing each video into individual frames, we extract relevant data to build a diverse dataset, reflecting natural variations in the execution of gestures.
+
+\textbf{Conversion to Numerical Data:} Converting visual information from frames into a set of numerical coordinates $(x, y)$, as illustrated in our graphs, represents hand movements over time.
+
+\textbf{Normalization and Standardization:} We apply normalization and standardization techniques to reduce variability between samples, which is essential for the machine learning model to generalize from the collected data. The normalized coordinates $(x', y')$ are calculated as:
+
+\begin{equation}
+x' = \frac{x - \mu_x}{\sigma_x}, \quad y' = \frac{y - \mu_y}{\sigma_y}
+\end{equation}
+
+where $\mu_x$ and $\mu_y$ are the means of the $x$ and $y$ coordinates across the dataset, and $\sigma_x$ and $\sigma_y$ are their respective standard deviations.
+
+% Fim da seção de construção do dataset
+
+\subsection{Labeling and Data Annotation}
+
+Labeling and annotating our dataset was carried out with the following methodology: each gesture is numerically represented as a line in a CSV file, where "X" symbolizes the gesture data and "Y" a unique numerical identifier for each type of movement. The structure can be described by a regular expression to facilitate understanding:
+
+\begin{verbatim}
+((["][(][0-9]+[,][ ][0-9]+[)]["][,]){22}[0-9]+[.][0-9]+[,]){20}
+\end{verbatim}
+
+This approach allows the entire dataset to be submitted for training and testing of the neural network in a single file, ensuring flexibility and ease in data handling. The simplicity of data ingestion contrasts with the abstract complexity of the dataset's structure and its labeling. A single file containing a complete dataset for computational video vision, in numerical format, represents a significant advancement and provides an efficient alternative for neural network training.
+
+\subsection{Neural Network Input}
+
+The input to our neural networks is designed to capture the complexity and dynamics of human gestures. The 840-parameter input vector is a flattened representation of the data, where each Cartesian point captured from the gestures is transformed into a linear numerical sequence. This allows the neural network to process video data efficiently, learning temporal and spatial patterns of gestures. Converting data points into a flattened format is crucial for reducing data dimensionality, which can help to speed up training without compromising the recognition capacity for complex patterns.
+
+\subsection{Optimization and Model Validation}
+
+To ensure the efficiency and efficacy of the neural network, we adopted a rigorous approach to optimization and validation. We used techniques such as cross-validation and hyperparameter tuning to find the ideal configuration that provides the best accuracy without falling into the trap of overfitting. Moreover, we employed regularization and dropout techniques to better generalize our model. Validation is performed with an independent test dataset, ensuring that the model can generalize well to data not seen during training.
+
+\subsection{Neural Network Diagram}
+
+% The actual drawing of the neural network diagram in LaTeX can be quite complex and is beyond the scope of this example.
+% Below is a placeholder for where you would include your TikZ code for the diagram.
+
+
+
+
+\end{document}
 
 \section{Conclusion}
 "Barium" stands as a significant milestone in human-computer interaction. The successful integration of neural networks and hand-tracking technologies not only demonstrates the technical feasibility of such innovations but also opens new avenues for intuitive and accessible interfaces. The project extends its impact beyond technology, influencing fields like education, healthcare, and entertainment.

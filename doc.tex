@@ -3,6 +3,11 @@
 \usepackage{hyperref}
 \usepackage{amsmath}
 \usepackage{amsfonts}
+\usepackage{tikz} % Added for TikZ graphics
+\usetikzlibrary{positioning} % Added for advanced node positioning
+
+
+
 
 \begin{document}
 
@@ -94,7 +99,49 @@ To ensure the efficiency and efficacy of the neural network, we adopted a rigoro
 
 
 
-\end{document}
+% Define the style for the nodes
+\tikzstyle{mynode}=[thick,draw=blue,fill=blue!20,circle,minimum size=22]
+
+
+\begin{tikzpicture}[x=2.2cm,y=1.4cm]
+  % Define the number of nodes in each layer
+  \foreach \N [count=\lay,remember={\N as \Nprev (initially 0);}]
+               in {4,5,5,5,3}{ % Number of nodes in layers 1 to 5
+    % Create the nodes
+    \foreach \i [evaluate={\y=\N/2-\i; \x=\lay; \prev=int(\lay-1);}]
+                 in {1,...,\N}{ % Loop over nodes in the current layer
+      % Nodes are placed at position (\x, \y)
+      \node[mynode] (N\lay-\i) at (\x,\y) {};
+      % Connect nodes to the previous layer
+      \ifnum\Nprev>0 % If not the first layer
+        \foreach \j in {1,...,\Nprev}{ % Loop over nodes in the previous layer
+          \draw[thick] (N\prev-\j) -- (N\lay-\i);
+        }
+      \fi
+    }
+  }
+\end{tikzpicture}
+
+\subsection{Activation Functions}
+Activation functions introduce non-linearity to the neural network, enabling it to learn complex patterns. In our models, we use the following activation functions:
+
+\textbf{ReLU (Rectified Linear Unit):} Applied to hidden layers, ReLU introduces non-linearity, enhancing the network's ability to capture a wide range of phenomena:
+\begin{equation}
+f(x) = \max(0, x)
+\end{equation}
+
+\textbf{Sigmoid:} Often used in the output layer for binary classification, it squashes the input to a range between 0 and 1, suitable for binary outcome predictions:
+\begin{equation}
+\sigma(x) = \frac{1}{1 + e^{-x}}
+\end{equation}
+
+\textbf{Softmax:} Utilized in the output layer for multi-class classification, Softmax provides a probability distribution over various classes:
+\begin{equation}
+\sigma(\mathbf{z})_i = \frac{e^{z_i}}{\sum_{k=1}^{K} e^{z_k}}
+\end{equation}
+for \( i = 1, \ldots, K \), where \( K \) is the number of classes.
+
+
 
 \section{Conclusion}
 "Barium" stands as a significant milestone in human-computer interaction. The successful integration of neural networks and hand-tracking technologies not only demonstrates the technical feasibility of such innovations but also opens new avenues for intuitive and accessible interfaces. The project extends its impact beyond technology, influencing fields like education, healthcare, and entertainment.

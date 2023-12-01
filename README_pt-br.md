@@ -74,7 +74,7 @@ O software agora deve estar ativo, e você pode interagir com seu computador usa
 
 ## Desenvolver
 
-No processo de desenvolvimento, começamos com a criação de um software de coleta de dados para construir nosso dataset personalizado. Em seguida, passamos para o desenvolvimento de uma rede neural, utilizando aprendizado profundo e redes neurais convolucionais (CNN). Por fim, criamos um software que emprega esta rede para reconhecer movimentos em tempo real e executar ações correspondentes.
+No processo de desenvolvimento, começamos com a criação de um software de coleta de dados para construir nosso conjunto de dados personalizado. Em seguida, passamos para o desenvolvimento de uma rede neural, utilizando aprendizado profundo e redes neurais convolucionais (CNN). Finalmente, criamos um software que emprega esta rede para reconhecer movimentos em tempo real e executar ações correspondentes. Para mais informações detalhadas sobre o desenvolvimento do Barium, por favor leia o [Guia do Desenvolvedor][Dev].
 
  
  ## Dataset
@@ -100,8 +100,14 @@ No processo de desenvolvimento, começamos com a criação de um software de col
 [Daniel Alvarenga]: https://github.com/Daniel-Alvarenga
 [Vitor Carvalho]: https://github.com/VitorCarvalho67
 
+## Licença
+ O software é licenciado sob a GPL-3.
+
+<p >
+  <img src="https://i.imgur.com/9kXfG6P.png" />
+</p>
 
 
-
+[dev]:DEV.md  
 
 

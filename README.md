@@ -72,7 +72,7 @@ The software should now be active, and you can interact with your computer using
 
 ## Develop
 
-In the development process, we start with the creation of a data collection software to build our custom dataset. Next, we move on to developing a neural network, utilizing deep learning and convolutional neural networks (CNN). Finally, we create software that employs this network to recognize real-time movements and execute corresponding actions.
+In the development process, we start with the creation of a data collection software to build our custom dataset. Next, we move on to developing a neural network, utilizing deep learning and convolutional neural networks (CNN). Finally, we create software that employs this network to recognize real-time movements and execute corresponding actions For more detailed information on developing Barium, please read the [Developer Guide][Dev]
 
 ## Dataset
 
@@ -103,4 +103,5 @@ In the development process, we start with the creation of a data collection soft
   <img src="https://i.imgur.com/9kXfG6P.png" />
 </p>
 
+[dev]:DEV.md  
 

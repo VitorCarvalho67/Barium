@@ -580,6 +580,7 @@ class UI():
 
         self.btn5.clicked.connect(self.game)
         # self.btn1.clicked.connect(self.mouse)
+        self.btn4.clicked.connect(self.openMoviments)
 
         self.window.show()    
             
@@ -592,6 +593,9 @@ class UI():
 
     def __on_button_click(self):
         self.app.quit()
+
+    def openMoviments(self):
+        webbrowser.open('https://barium-ia.netlify.app/pages/manual.html')
 
     def SetVideo(self, frame):
         max_width = 380

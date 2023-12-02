@@ -85,7 +85,25 @@ This approach allows the entire dataset to be submitted for training and testing
 
 \subsection{Neural Network Input}
 
-The input to our neural networks is designed to capture the complexity and dynamics of human gestures. The 840-parameter input vector is a flattened representation of the data, where each Cartesian point captured from the gestures is transformed into a linear numerical sequence. This allows the neural network to process video data efficiently, learning temporal and spatial patterns of gestures. Converting data points into a flattened format is crucial for reducing data dimensionality, which can help to speed up training without compromising the recognition capacity for complex patterns.
+The input to our neural networks is designed to capture the complexity and dynamics of human gestures. The dataset features are detailed in Table \ref{tab:dataset_features}, which represents the 20-dimensional input vector for our neural network.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Feature} & \textbf{Description} \\ \hline
+\( p0\_0 \) & Normalized x-coordinate of point 0 \\ \hline
+\( p1\_0 \) & Normalized y-coordinate of point 0 \\ \hline
+\( p2\_0 \) & Normalized x-coordinate of point 1 \\ \hline
+% ... Add all other features here
+\( p18\_0 \) & Normalized x-coordinate of point 9 \\ \hline
+\( p19\_0 \) & Normalized y-coordinate of point 9 \\ \hline
+\end{tabular}
+\caption{The 20-dimensional input vector representing hand gesture features.}
+\label{tab:dataset_features}
+\end{table}
+
+Each row in the table corresponds to a feature extracted from the video frames, encapsulating the spatial positioning of hand landmarks. These features are subsequently flattened into a vector form for input into the neural network.
 
 \subsection{Optimization and Model Validation}
 
@@ -150,3 +168,4 @@ for \( i = 1, \ldots, K \), where \( K \) is the number of classes.
 \bibliography{references}
 
 \end{document}
+

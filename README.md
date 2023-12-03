@@ -66,7 +66,8 @@ Make sure your webcam is connected and functional.
 In your virtual environment, run the main software script.
 
 ```bash
-python BariumMouse.py
+cd src
+python main.py
 ```
 The software should now be active, and you can interact with your computer using hand gestures.
 

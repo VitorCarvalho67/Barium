@@ -62,7 +62,8 @@ Asegúrate de que tu cámara web esté conectada y funcional.
 En tu entorno virtual, ejecuta el script principal del software.
 
 ```bash
-python BariumMouse.py
+cd src
+python main.py
 ```
 El software ahora debería estar activo, y puedes interactuar con tu computadora usando gestos con las manos.
 

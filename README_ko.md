@@ -56,7 +56,8 @@ source venv/bin/activate
 가상 환경에서 메인 소프트웨어 스크립트를 실행합니다.
 
 ```python
-python BariumMouse.py
+cd src
+python main.py
 ```
 
 이제 소프트웨어가 활성화되었으며 손동작을 사용하여 컴퓨터와 상호 작용할 수 있습니다.

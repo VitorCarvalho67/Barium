@@ -22,7 +22,7 @@ intervalo = 100
 quantidade_de_frames = 20
 
 exibir_conexoes = True
-mostrar_numeros = True
+mostrar_numeros = False
 dataset = "../data/bariumData.csv"
 
 def calcular_distancia(ponto1, ponto2):
@@ -30,10 +30,8 @@ def calcular_distancia(ponto1, ponto2):
 
 def aumentar_contraste(frane):
 
-    alpha = 2
-    beta = 0
-
-    imagem = cv2.convertScaleAbs(frame, alpha=alpha, beta=beta)
+    
+    imagem = cv2.convertScaleAbs(frame)
 
     return imagem
 
@@ -88,7 +86,7 @@ while True:
 
                 x, y, w, h = x - 10, y - 10, tamanho_max + 20, tamanho_max + 20
 
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                cv2.rectangle(frame, (x, y), (x + w, y + h), 2)
 
             if exibir_conexoes:
                 mp.solutions.drawing_utils.draw_landmarks(frame, pontos_mao, mp_maos.HAND_CONNECTIONS)

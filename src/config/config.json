@@ -1,0 +1,12 @@
+{
+    "exibicao": {
+      "exibir_pontos": true,
+      "exibir_limites": true,
+      "navegar": false
+    },
+    "video": {
+      "entrada": 0,
+      "saturacao": 1.48,
+      "brilho": 21
+    }
+  }

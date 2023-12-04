@@ -2,6 +2,7 @@ from comtypes import CLSCTX_ALL
 from ctypes import cast, POINTER
 import cv2
 import io
+import json
 from keras.models import load_model
 import math
 import matplotlib.pyplot as plt
@@ -11,10 +12,11 @@ import numpy as np
 import os
 import pyautogui
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore
 from PyQt5.QtGui import QPixmap, QImage, QIcon
 from PyQt5.QtCore import QThread, QThread, pyqtSignal
-from PyQt5.QtWidgets import QApplication, QLabel, QApplication, QMainWindow, QLabel, QPushButton
+from PyQt5.QtWidgets import QComboBox, QApplication, QLabel, QApplication, QMainWindow, QLabel, QPushButton, QCheckBox, QSlider
+from PyQt5.QtMultimedia import QCameraInfo
 import sys
 import subprocess
 import time
@@ -26,11 +28,22 @@ class VideoCaptureThread(QThread):
     frameCaptured = pyqtSignal(QImage)
     handImage = pyqtSignal(QImage)
     summary = pyqtSignal(str)
+    change_mouse_sinal = pyqtSignal(bool)
 
     def __init__(self, mp_config=None, parent=None):
         super().__init__()
-        self.cap = cv2.VideoCapture(0)
 
+        with open('config/config.json') as f:
+            self.data = json.load(f)
+
+        self.draw_points = self.data["exibicao"]["exibir_pontos"]
+        self.draw_hand_limits = self.data["exibicao"]["exibir_limites"]
+        self.agir = self.data["exibicao"]["navegar"]
+        self.cam_indice = self.data["video"]["entrada"]
+        self.alpha = self.data["video"]["saturacao"]
+        self.beta = self.data["video"]["brilho"]
+
+        self.cap = cv2.VideoCapture(self.cam_indice)
         self.model = self.load_model()
 
         self.video_record_run = False
@@ -48,7 +61,8 @@ class VideoCaptureThread(QThread):
 
         self.draw_hand_image = False
         self.mode_mouse = False
-
+        self.change_mouse = False
+        
         self.status = False
         self.mp_config = mp_config or {}
         self.mp_hands = mp.solutions.hands
@@ -95,13 +109,25 @@ class VideoCaptureThread(QThread):
             qImg = QImage(frame.data, width, height, step, QImage.Format_RGB888)
             self.frameCaptured.emit(qImg)
 
-            if self.draw_hand_image:
-                self.drawHand(coordenadas)
+            # if self.draw_hand_image:
+            #     self.drawHand(coordenadas)
+
+            #     self.draw_hand_image = False
         
             self.tempo_atual = time.time() * 1000
 
             if self.tempo_atual - self.last_summary >= 2000:
                 self.summary.emit("")
+
+            if self.change_mouse:
+                self.change_mouse = False
+
+                if self.mode_mouse:
+                    self.stopMouseMode()
+                else: 
+                    self.activateMouseMode()
+
+                
 
             if self.video_record_run == True:
                 if self.video_frame == 0:
@@ -125,7 +151,11 @@ class VideoCaptureThread(QThread):
                         self.video_record_run = False
 
                         self.video = np.array(self.video)
-                        self.predict(self.video)
+
+                        self.draw_hand_image = True
+
+                        if self.agir:
+                            self.predict(self.video)
 
                         self.video = []
             elif not self.mode_mouse:
@@ -137,10 +167,7 @@ class VideoCaptureThread(QThread):
         w, h, _ = frame.shape
         maos = self.mp_hands.Hands(max_num_hands=1)
 
-        alpha = 1
-        beta = 0
-
-        imagem = cv2.convertScaleAbs(frame, alpha=alpha, beta=beta)
+        imagem = cv2.convertScaleAbs(frame, alpha=self.alpha, beta=self.beta)
 
         x, y, w, h = 0, 0, 0, 0
         
@@ -167,9 +194,11 @@ class VideoCaptureThread(QThread):
 
                     x, y, w, h = x - 10, y - 10, tamanho_max + 20, tamanho_max + 20
 
-                    cv2.rectangle(imagem, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                    if self.draw_hand_limits:
+                        cv2.rectangle(imagem, (x, y), (x + w, y + h), (64, 71, 238), 2)
 
-                mp.solutions.drawing_utils.draw_landmarks(imagem, pontos_mao, self.mp_hands.HAND_CONNECTIONS)
+                if self.draw_points:
+                    mp.solutions.drawing_utils.draw_landmarks(imagem, pontos_mao, self.mp_hands.HAND_CONNECTIONS)
         
         coordenadas = self.ProcessarCoordenadas(lista_pontos, x, y, w, h)
 
@@ -283,11 +312,11 @@ class VideoCaptureThread(QThread):
         self.summary.emit(texto)
         self.last_summary = time.time() * 1000
 
-
-        if previsao != 2:
+        if previsao != 2 and previsao != 11:
+            
             self.functionExcecute(previsao)
         else:
-            self.mode_mouse = True
+            self.activateMouseMode()
 
         previsoes_tratadas = []
 
@@ -332,7 +361,7 @@ class VideoCaptureThread(QThread):
         buf = io.BytesIO()
         plt.figure(figsize=(10, 10))
         nx.draw(image_mao, pos, node_size=150, node_color=list(node_colors.values()), edge_color="#EE4740", arrows=False, with_labels=False)
-        nx.draw(image_mao, pos, node_size=150, node_color="#007FFF", edge_color="#003566", arrows=False, with_labels=False)
+        # nx.draw(image_mao, pos, node_size=150, node_color="#007FFF", edge_color="#003566", arrows=False, with_labels=False)
         plt.savefig(buf, format='png', transparent=True, dpi=300)
         buf.seek(0)
         plt.close()
@@ -351,6 +380,13 @@ class VideoCaptureThread(QThread):
     def functionExcecute(self, function):
         function = getattr(self.controler, self.movesAction[function])
         function()
+
+    def activateMouseMode(self):
+        self.summary.emit("Entrando no modo mouse...")
+        self.change_mouse_sinal.emit(True)
+        self.last_summary = time.time() * 1000
+
+        self.mode_mouse = True
 
     def mouse(self, results):
         if results.multi_hand_landmarks:
@@ -373,21 +409,6 @@ class VideoCaptureThread(QThread):
         for finger_tip, knuckle, finger_name in zip(finger_tips, knuckles, finger_names):
             setattr(self, f'{finger_name}_down', getattr(self.hand_Landmarks.landmark[finger_tip], 'y') > getattr(self.hand_Landmarks.landmark[knuckle], 'y'))
             setattr(self, f'{finger_name}_up', getattr(self.hand_Landmarks.landmark[finger_tip], 'y') < getattr(self.hand_Landmarks.landmark[knuckle], 'y'))
-
-        # print(self.little_finger_down, self.index_finger_down, self.middle_finger_down, self.ring_finger_down, self.Thump_finger_down)
-
-        # self.little_finger_down = self.hand_Landmarks.landmark[20].y > self.hand_Landmarks.landmark[17].y
-        # self.little_finger_up = self.hand_Landmarks.landmark[20].y < self.hand_Landmarks.landmark[17].y
-        # self.index_finger_down = self.hand_Landmarks.landmark[8].y > self.hand_Landmarks.landmark[5].y
-        # self.index_finger_up = self.hand_Landmarks.landmark[8].y < self.hand_Landmarks.landmark[5].y
-        # self.middle_finger_down = self.hand_Landmarks.landmark[12].y > self.hand_Landmarks.landmark[9].y
-        # self.middle_finger_up = self.hand_Landmarks.landmark[12].y < self.hand_Landmarks.landmark[9].y
-        # self.ring_finger_down = self.hand_Landmarks.landmark[16].y > self.hand_Landmarks.landmark[13].y
-        # self.ring_finger_up = self.hand_Landmarks.landmark[16].y < self.hand_Landmarks.landmark[13].y
-        # self.Thump_finger_down = self.hand_Landmarks.landmark[4].y > self.hand_Landmarks.landmark[13].y
-        # self.Thump_finger_up = self.hand_Landmarks.landmark[4].y < self.hand_Landmarks.landmark[13].y
-
-        # print(self.little_finger_down, self.index_finger_down, self.middle_finger_down, self.ring_finger_down, self.Thump_finger_down)
 
         self.all_fingers_down = self.index_finger_down and self.middle_finger_down and self.ring_finger_down and self.little_finger_down
         self.all_fingers_up = self.index_finger_up and self.middle_finger_up and self.ring_finger_up and self.little_finger_up
@@ -508,6 +529,7 @@ class VideoCaptureThread(QThread):
             
     def stopMouseMode(self):
         self.summary.emit("Saindo do modo mouse...")
+        self.change_mouse_sinal.emit(False)
         self.last_summary = time.time() * 1000
 
         self.mode_mouse = False
@@ -517,19 +539,30 @@ class VideoCaptureThread(QThread):
 class UI():
     def __init__(self):
         super().__init__()
+
+        self.config_open = False
+
         self.app = QApplication(sys.argv)
         self.window = QMainWindow()
         self.central_widget = QLabel(self.window)
         self.button = QPushButton("", self.window)
         self.label = QLabel(self.window)
-
         self.btn1 = QPushButton("Mouse", self.window)
         self.btn2 = QPushButton("Teclado", self.window)
         self.btn3 = QPushButton("Configurações", self.window)
         self.btn4 = QPushButton("Movimentos", self.window)
         self.btn5 = QPushButton("Jogos", self.window)
-        self.Texto = QLabel("Movimento:",self.window)
+        self.Texto = QLabel("",self.window)
         self.label2 = QLabel("", self.window)
+        self.checkbox = QCheckBox("Exibir pontos", self.window)
+        self.checkbox2 = QCheckBox("Exibir limites", self.window)
+        self.checkbox3 = QCheckBox("Usar navegação", self.window)
+        self.camera_combobox = QComboBox(self.window)
+        self.slider = QSlider(QtCore.Qt.Horizontal, self.window)
+        self.slider2 = QSlider(QtCore.Qt.Horizontal, self.window)
+        self.label3 = QLabel("Entrada de vídeo:", self.window)
+        self.label4 = QLabel("Saturação:", self.window)
+        self.label5 = QLabel("Brilho:", self.window)
 
         self.__windowBuild()
 
@@ -545,61 +578,171 @@ class UI():
         self.central_widget.setGeometry(0, 0, 250, 80)
         self.central_widget.setAlignment(QtCore.Qt.AlignCenter)
 
-        self.button.setStyleSheet("background-color: #077208; border-radius: 15px;")
-        self.button.setGeometry(650, 20, 30, 30)
-        self.button.clicked.connect(self.__on_button_click, QtCore.Qt.UniqueConnection)
+        self.video_thread = VideoCaptureThread()
 
-        self.Texto.setGeometry(20, 400, 200, 25)
-        self.btn1.setGeometry(240, 400, 70, 25)
-        self.btn2.setGeometry(320, 400, 70, 25)
-        self.btn3.setGeometry(400, 400, 100, 25)
-        self.btn4.setGeometry(510, 400, 100, 25)
-        self.btn5.setGeometry(620, 400, 70, 25)
-        self.label.setGeometry(0, 0, 0, 0)
-        self.label2.setGeometry(0, 0, 0, 0)
+        self.button.setGeometry(650, 20, 30, 30)
+        self.Texto.setGeometry(20, 395, 200, 25)
+        self.btn1.setGeometry(230, 435, 70, 25)
+        self.btn2.setGeometry(310, 435, 70, 25)
+        self.btn3.setGeometry(390, 435, 110, 25)
+        self.btn4.setGeometry(510, 435, 100, 25)
+        self.btn5.setGeometry(620, 435, 60, 25)
+        self.label.setGeometry(20, 80, 350, 300)
+        self.label2.setGeometry(430, 100, 240, 240)
+
+        self.label2.setPixmap(QPixmap("../img/mao.png").scaled(240, 240))
+
+        self.checkbox.setGeometry(450, 80, 0,0)
+        self.checkbox2.setGeometry(450, 110, 0,0)
+        self.checkbox3.setGeometry(450, 140, 0,0)
+        self.label3.setGeometry(450, 180, 0,0)
+        self.camera_combobox.setGeometry(450, 210, 0,0)
+        self.label4.setGeometry(450, 250, 0,0)
+        self.slider.setGeometry(450, 280, 0,0)
+        self.label5.setGeometry(450, 310, 0,0)
+        self.slider2.setGeometry(450, 340, 0,0)
+
+        self.checkbox.setChecked(self.video_thread.draw_points)
+        self.checkbox2.setChecked(self.video_thread.draw_hand_limits)
+        self.checkbox3.setChecked(self.video_thread.agir)
+
+        self.populate_camera_combobox()
+
+        self.checkbox.setStyleSheet("color: #CDD6F4; font-size: 14px;")
+        self.checkbox2.setStyleSheet("color: #CDD6F4; font-size: 14px;")
+        self.camera_combobox.setStyleSheet(
+            "QComboBox {"
+            "   color: #CDD6F4;"
+            "   border: 1px solid #EE4740;"
+            "   font-size: 14px;"
+            "}"
+            "QComboBox::item {"
+            "   color: #CDD6F4;"
+            "   border: 1px solid #EE4740;"
+            "   font-size: 14px;"
+            "}"
+        )
+
+        self.camera_combobox.setCurrentIndex(self.video_thread.cam_indice)
+
+        self.slider.setMinimum(50)
+        self.slider.setMaximum(100)
+        self.slider.setValue(int(self.video_thread.alpha * 50))
+        self.slider.setTickInterval(10)
+        self.slider.setTickPosition(QSlider.TicksBelow)
+
+        self.slider2.setMinimum(-50)
+        self.slider2.setMaximum(50)
+        self.slider2.setValue(self.video_thread.beta)
+        self.slider2.setTickInterval(20)
+        self.slider2.setTickPosition(QSlider.TicksBelow)
+
 
         self.Texto.setStyleSheet("color: #CDD6F4; font-size: 14px;")
-        self.btn1.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
-        self.btn1.setGeometry(240, 400, 70, 25)
-        self.btn1.clicked.connect(self.__on_button_click)
-
-        self.btn2.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
-        self.btn3.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
-        self.btn4.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
-        self.btn5.setStyleSheet("background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;")
+        self.label3.setStyleSheet("color: #CDD6F4; font-size: 14px;")
+        self.label4.setStyleSheet("color: #CDD6F4; font-size: 14px;")
+        self.label5.setStyleSheet("color: #CDD6F4; font-size: 14px;")
+        self.button.setStyleSheet("background-color: #077208; border-radius: 15px;")
+        self.btn1.setStyleSheet(
+            "QPushButton {background-color: #1e1e2e; border: 1px solid #EE4740; border-radius: 10px; color: #EE4740; font-size: 14px;}"
+            "QPushButton:hover {background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;}"
+            )
+        self.btn2.setStyleSheet(
+            "QPushButton {background-color: #1e1e2e; border: 1px solid #EE4740; border-radius: 10px; color: #EE4740; font-size: 14px;}"
+            "QPushButton:hover {background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;}"
+            )
+        self.btn3.setStyleSheet(
+            "QPushButton {background-color: #1e1e2e; border: 1px solid #EE4740; border-radius: 10px; color: #EE4740; font-size: 14px;}"
+            "QPushButton:hover {background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;}"
+        )
+        self.btn4.setStyleSheet(
+            "QPushButton {background-color: #1e1e2e; border: 1px solid #EE4740; border-radius: 10px; color: #EE4740; font-size: 14px;}"
+            "QPushButton:hover {background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;}"
+        )
+        self.btn5.setStyleSheet(
+            "QPushButton {background-color: #1e1e2e; border: 1px solid #EE4740; border-radius: 10px; color: #EE4740; font-size: 14px;}"
+            "QPushButton:hover {background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;}"
+        )
+        self.checkbox3.setStyleSheet("color: #CDD6F4; font-size: 14px;")
+        
         self.label.setStyleSheet("border-radius: 10px; color: #CDD6F4; font-size: 14px; background-color: #1e1e5e;")
-        self.label.setStyleSheet("border-radius: 10px; color: #CDD6F4; font-size: 14px; background-color: #1e1e5e;")
-
-        self.label.setGeometry(20, 70, 350, 300)
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setScaledContents(True)
         
-        self.label2.setGeometry(430, 100, 240, 240)
         self.label2.setAlignment(QtCore.Qt.AlignCenter)
         self.label2.setScaledContents(True)
 
-        self.btn5.clicked.connect(self.game)
-        # self.btn1.clicked.connect(self.mouse)
+        self.button.clicked.connect(self.__on_button_click, QtCore.Qt.UniqueConnection)
+        self.btn1.clicked.connect(self.mouse_activate)
+        self.btn3.clicked.connect(self.config_alter)
         self.btn4.clicked.connect(self.openMoviments)
+        self.btn5.clicked.connect(self.game)
+        self.checkbox.stateChanged.connect(self.toggleHandPoints)
+        self.checkbox2.stateChanged.connect(self.toggleHandlimits)
+        self.checkbox3.stateChanged.connect(self.toggleHandNavigation)
+        self.camera_combobox.currentIndexChanged.connect(self.camera_changed)
+        self.slider.valueChanged.connect(self.update_alpha)
+        self.slider2.valueChanged.connect(self.update_beta)
 
-        self.window.show()    
+        self.window.show()
             
-        self.video_thread = VideoCaptureThread()
         self.video_thread.frameCaptured.connect(self.SetVideo)
         self.video_thread.summary.connect(self.SetText)
         self.video_thread.handImage.connect(self.SetHand)
+        self.video_thread.change_mouse_sinal.connect(self.button_change)
         self.video_thread.start()
-
 
     def __on_button_click(self):
         self.app.quit()
+
+    def config_alter(self):
+        if self.config_alter:
+            self.config_alter = False
+
+            self.label2.setGeometry(430, 100, 0, 0)
+
+            self.checkbox.setGeometry(450, 80, 150, 25)
+            self.checkbox2.setGeometry(450, 110, 150, 25)
+            self.checkbox3.setGeometry(450, 140, 150, 25)
+            self.label3.setGeometry(450, 180, 240, 25)
+            self.camera_combobox.setGeometry(450, 210, 200, 30)
+            self.label4.setGeometry(450, 250, 240, 25)
+            self.slider.setGeometry(450, 280, 150, 20)
+            self.label5.setGeometry(450, 310, 240, 25)
+            self.slider2.setGeometry(450, 340, 150, 20)
+        
+            self.btn3.setStyleSheet(
+                "QPushButton {background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;}"
+                "QPushButton:hover {background-color: #1e1e2e; border: 1px solid #EE4740; border-radius: 10px; color: #EE4740; font-size: 14px;}"
+            )
+
+        else:
+            self.config_alter = True
+
+            self.label2.setGeometry(430, 100, 240, 240)
+
+            self.checkbox.setGeometry(450, 80, 0,0)
+            self.checkbox2.setGeometry(450, 110, 0,0)
+            self.checkbox3.setGeometry(450, 140, 0,0)
+            self.label3.setGeometry(450, 180, 0,0)
+            self.camera_combobox.setGeometry(450, 210, 0,0)
+            self.label4.setGeometry(450, 250, 0,0)
+            self.slider.setGeometry(450, 280, 0,0)
+            self.label5.setGeometry(450, 310, 0,0)
+            self.slider2.setGeometry(450, 340, 0,0)
+
+            self.btn3.setStyleSheet(
+                "QPushButton {background-color: #1e1e2e; border: 1px solid #EE4740; border-radius: 10px; color: #EE4740; font-size: 14px;}"
+                "QPushButton:hover {background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;}"
+            )
+
 
     def openMoviments(self):
         webbrowser.open('https://barium-ia.netlify.app/pages/manual.html')
 
     def SetVideo(self, frame):
         max_width = 380
-        self.label.setGeometry(20, 70, max_width, int(frame.height() / (frame.width()/max_width)))
+        self.label.setGeometry(20, 80, max_width, int(frame.height() / (frame.width()/max_width)))
         self.label.setPixmap(QPixmap.fromImage(frame))
 
     def SetText(self, texto):
@@ -612,6 +755,70 @@ class UI():
         else:
             print("Tipo de imagem não suportado.")
 
+    def toggleHandPoints(self, state):
+        self.video_thread.draw_points = state == QtCore.Qt.Checked
+
+        self.video_thread.data['exibicao']['exibir_pontos'] = self.video_thread.draw_points
+        with open('config/config.json', 'w') as arquivo:
+            json.dump(self.video_thread.data, arquivo, indent=2)
+
+    def toggleHandlimits(self, state):
+        self.video_thread.draw_hand_limits = state == QtCore.Qt.Checked
+
+        self.video_thread.data['exibicao']['exibir_limites'] = self.video_thread.draw_hand_limits
+        with open('config/config.json', 'w') as arquivo:
+            json.dump(self.video_thread.data, arquivo, indent=2)
+
+    def toggleHandNavigation(self, state):
+        self.video_thread.agir = state == QtCore.Qt.Checked
+
+        self.video_thread.data['exibicao']['navegar'] = self.video_thread.agir
+        with open('config/config.json', 'w') as arquivo:
+            json.dump(self.video_thread.data, arquivo, indent=2)
+
+    def camera_changed(self):
+        selected_index = self.camera_combobox.currentIndex()
+        self.video_thread.cap = cv2.VideoCapture(selected_index)
+
+        self.video_thread.data['video']['entrada'] = selected_index
+        with open('config/config.json', 'w') as arquivo:
+            json.dump(self.video_thread.data, arquivo, indent=2)
+
+    def update_alpha(self, value):
+        self.video_thread.alpha = value / 50
+
+        self.video_thread.data['video']['saturacao'] = self.video_thread.alpha
+        with open('config/config.json', 'w') as arquivo:
+            json.dump(self.video_thread.data, arquivo, indent=2)
+
+    def update_beta(self, value):
+        self.video_thread.beta = value
+
+        self.video_thread.data['video']['brilho'] =  self.video_thread.beta
+        with open('config/config.json', 'w') as arquivo:
+            json.dump(self.video_thread.data, arquivo, indent=2)
+
+    def populate_camera_combobox(self):
+        camera_info = QCameraInfo.availableCameras()
+
+        for info in camera_info:
+            self.camera_combobox.addItem(info.description())
+
+    def button_change(self, state):
+        if state:
+            self.btn1.setStyleSheet(
+                "QPushButton {background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;}"
+                "QPushButton:hover {background-color: #1e1e2e; border: 1px solid #EE4740; border-radius: 10px; color: #EE4740; font-size: 14px;}"
+            )            
+        else:
+            self.btn1.setStyleSheet(
+                "QPushButton {background-color: #1e1e2e; border: 1px solid #EE4740; border-radius: 10px; color: #EE4740; font-size: 14px;}"
+                "QPushButton:hover {background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;}"
+            )
+
+    def mouse_activate(self):
+        self.video_thread.change_mouse = True
+
     def game(self):
         game_script_path = "../modules/games/window.py"
         
@@ -619,8 +826,8 @@ class UI():
         subprocess.Popen(["python", full_path], shell=True)
         sys.exit()
 
-class action():
 
+class action():
     def __init__(self):
         pass
     
@@ -686,4 +893,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -15,7 +15,7 @@ from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 from PyQt5 import QtCore
 from PyQt5.QtGui import QPixmap, QImage, QIcon
 from PyQt5.QtCore import QThread, QThread, pyqtSignal
-from PyQt5.QtWidgets import QComboBox, QApplication, QLabel, QApplication, QMainWindow, QLabel, QPushButton, QCheckBox, QSlider
+from PyQt5.QtWidgets import QComboBox, QApplication, QMainWindow, QLabel, QPushButton, QCheckBox, QSlider, QAbstractItemView
 from PyQt5.QtMultimedia import QCameraInfo
 import sys
 import subprocess
@@ -126,8 +126,6 @@ class VideoCaptureThread(QThread):
                     self.stopMouseMode()
                 else: 
                     self.activateMouseMode()
-
-                
 
             if self.video_record_run == True:
                 if self.video_frame == 0:
@@ -610,19 +608,19 @@ class UI():
 
         self.checkbox.setStyleSheet("color: #CDD6F4; font-size: 14px;")
         self.checkbox2.setStyleSheet("color: #CDD6F4; font-size: 14px;")
-        self.camera_combobox.setStyleSheet(
-            "QComboBox {"
-            "   color: #CDD6F4;"
-            "   border: 1px solid #EE4740;"
-            "   font-size: 14px;"
-            "}"
-            "QComboBox::item {"
-            "   color: #CDD6F4;"
-            "   border: 1px solid #EE4740;"
-            "   font-size: 14px;"
-            "}"
-        )
+        
+        self.camera_combobox.setStyleSheet("color: #CDD6F4; font-size: 14px; background-color: #1e1e2e; border: 1px solid #EE4740;")
 
+        self.camera_combobox.view().setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.camera_combobox.view().setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.camera_combobox.view().setStyleSheet("QAbstractItemView {border: 1px solid #EE4740; color: #CDD6F4; font-size: 14px; background-color: #EE4740;}")
+        self.camera_combobox.view().setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.camera_combobox.view().setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+
+        self.camera_combobox.view().setStyleSheet("QAbstractItemView::item {border: 1px solid #EE4740; color: #CDD6F4; font-size: 14px; background-color: #EE4740;}")
+        self.camera_combobox.view().setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.camera_combobox.view().setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+        
         self.camera_combobox.setCurrentIndex(self.video_thread.cam_indice)
 
         self.slider.setMinimum(50)
@@ -636,7 +634,6 @@ class UI():
         self.slider2.setValue(self.video_thread.beta)
         self.slider2.setTickInterval(20)
         self.slider2.setTickPosition(QSlider.TicksBelow)
-
 
         self.Texto.setStyleSheet("color: #CDD6F4; font-size: 14px;")
         self.label3.setStyleSheet("color: #CDD6F4; font-size: 14px;")
@@ -878,7 +875,6 @@ class action():
 
     def AbrirNetflix(self):
         webbrowser.open("https://netflix.com")
-
 
     def AbrirDisneyPlus(self):
         webbrowser.open("https://disneyplus.com")

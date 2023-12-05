@@ -733,7 +733,6 @@ class UI():
                 "QPushButton:hover {background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;}"
             )
 
-
     def openMoviments(self):
         webbrowser.open('https://barium-ia.netlify.app/pages/manual.html')
 

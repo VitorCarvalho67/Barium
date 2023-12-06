@@ -68,15 +68,21 @@ x_train = x_train.reshape(x_train.shape[0], 840)
 
 model = Sequential()
 
+# model.add(Input(shape=(840)))
+# model.add(Flatten())
+# model.add(Dense(32, activation='relu'))
+# model.add(Dropout(0.5))
+# model.add(Dense(64, activation='relu'))
+# model.add(Dense(128, activation='relu'))
+# model.add(Dropout(0.5))
+# model.add(Dense(512, activation='sigmoid'))
+# model.add(Dense(quantidade_movimentos, activation='softmax'))
+
 model.add(Input(shape=(840)))
-model.add(Flatten())
-model.add(Dense(32, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(64, activation='relu'))
 model.add(Dense(128, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(512, activation='sigmoid'))
+model.add(Dropout(0.15))
 model.add(Dense(quantidade_movimentos, activation='softmax'))
+
 
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
@@ -85,4 +91,4 @@ model.fit(x_train, y_train, epochs=300, batch_size=256, validation_data=(x_test,
 loss, accuracy = model.evaluate(x, y)
 print(f"Acurácia do modelo: {accuracy*100:.2f}%")
 
-model.save("../../models/modelTest.keras")
+model.save("../../models/modelTest2.keras")

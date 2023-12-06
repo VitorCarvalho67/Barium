@@ -20,6 +20,7 @@ from PyQt5.QtMultimedia import QCameraInfo
 import sys
 import subprocess
 import time
+import vgamepad as vg
 import webbrowser
 
 pyautogui.FAILSAFE = False
@@ -29,6 +30,7 @@ class VideoCaptureThread(QThread):
     handImage = pyqtSignal(QImage)
     summary = pyqtSignal(str)
     change_mouse_sinal = pyqtSignal(bool)
+    change_game_sinal = pyqtSignal(bool)
 
     def __init__(self, mp_config=None, parent=None):
         super().__init__()
@@ -56,12 +58,14 @@ class VideoCaptureThread(QThread):
 
         self.video = []
         
-        self.movesAction = [ "FecharTelas", "PrintScreen", "AtivarModoMouseVirtual", "AumentarVolume", "IrParaCanalPredileto", "AbrirExploradorDeArquivos", "DiminuirVolume", "AumentarBrilho", "DiminuirBrilho", "AbrirNetflix", "AbrirDisneyPlus", "Confirmar"]
+        self.movesAction = [ "FecharTelas", "PrintScreen", "AtivarModoMouseVirtual", "AumentarVolume", "IrParaCanalPredileto", "AbrirExploradorDeArquivos", "DiminuirVolume", "AumentarBrilho", "DiminuirBrilho", "AbrirNetflix", "AbrirDisneyPlus", "Confirmar", "Samsung"]
         self.controler = action()
 
         self.draw_hand_image = False
         self.mode_mouse = False
+        self.mode_game = False
         self.change_mouse = False
+        self.change_game = False
         
         self.status = False
         self.mp_config = mp_config or {}
@@ -91,75 +95,122 @@ class VideoCaptureThread(QThread):
         self.little_finger_within_Thumb_finger = None
         self.ring_finger_within_Thumb_finger = None
 
+        self.MHD = MediapipeHandDetection()
+
+        self.gamepad = vg.VX360Gamepad()
+
+        self.wheel_r = int(1280*0.2)              
+        self.wheel_r_acc_max = int(1280*0.3)      
+        self.wheel_r_acc_min = int(1280*0.2)      
+        self.wheel_r_decc_max = int(1280*0.015)   
+        self.wheel_r_decc_min = int(1280*0.15)    
+
+        self.wheel_r_acc_max = 350/2
+        self.wheel_r_acc_min = 275/2
+        self.wheel_r_decc_max = 125/2
+        self.wheel_r_decc_min = 225/2
+
+        self.wheel_angle = 0
+        self.wheel_cent = (0,0)
+        self.wheel_spoke1 = (0,0)         
+        self.wheel_spoke2 = (0,0)
+        self.wheel_spoke3 = (0,0)
+
+        self.wheel_color_norm = (255,255,255)
+        self.wheel_color_acc = (0, 255,0)
+        self.wheel_color_decc = (0, 0, 255)
+        self.wheel_color_cur = self.wheel_color_norm
+
+        self.joystickvalues = 0         
+
+        self.hand_left = []
+        self.hand_right = []
+        self.hist_n = 5             
+
+        self.xl, self.yl = -1, -1
+        self.xr, self.yr = -1, -1
+
         self.last_summary = time.time() * 1000
 
     def run(self):
         while True:
-            sucesso, captura = self.cap.read()
-            if not sucesso:
-                continue
+            self.verify_changes()
 
-            captura = cv2.flip(captura, 1)
+            if not self.mode_game:
+                sucesso, captura = self.cap.read()
+                if not sucesso:
+                    continue
+                captura = cv2.flip(captura, 1)
 
-            frame, coordenadas, results = self.__getCoordinates(captura)
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                frame, coordenadas, results = self.__getCoordinates(captura)
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-            height, width, channel = frame.shape
-            step = channel * width
-            qImg = QImage(frame.data, width, height, step, QImage.Format_RGB888)
-            self.frameCaptured.emit(qImg)
+                if self.draw_hand_image:
+                    self.drawHand(coordenadas)
 
-            # if self.draw_hand_image:
-            #     self.drawHand(coordenadas)
+                    self.draw_hand_image = False
 
-            #     self.draw_hand_image = False
-        
-            self.tempo_atual = time.time() * 1000
+                height, width, channel = frame.shape
+                step = channel * width
+                qImg = QImage(frame.data, width, height, step, QImage.Format_RGB888)
+                self.frameCaptured.emit(qImg)
 
-            if self.tempo_atual - self.last_summary >= 2000:
-                self.summary.emit("")
+                if self.video_record_run == True:
+                    if self.video_frame == 0:
+                        if self.tempo_atual - self.tempo_anterior > self.intervalo_inicial:
+                            self.video.append(coordenadas)
+                            self.video_frame = 1
 
-            if self.change_mouse:
-                self.change_mouse = False
+                            self.tempo_anterior = time.time() * 1000
 
-                if self.mode_mouse:
-                    self.stopMouseMode()
-                else: 
-                    self.activateMouseMode()
+                    elif self.video_frame > 0 and self.video_frame < 20:
+                        if self.tempo_atual - self.tempo_anterior > self.intervalo:
+                            self.video.append(coordenadas)
+                            self.video_frame += 1
 
-            if self.video_record_run == True:
-                if self.video_frame == 0:
-                    if self.tempo_atual - self.tempo_anterior > self.intervalo_inicial:
-                        self.video.append(coordenadas)
-                        self.video_frame = 1
+                            self.tempo_anterior = time.time() * 1000
 
-                        self.tempo_anterior = time.time() * 1000
+                    elif self.video_frame > 0 and self.video_frame == 20:
+                        if self.tempo_atual - self.tempo_anterior > self.intervalo:
+                            self.video.append(coordenadas)
+                            self.video_frame = -1
+                            self.video_record_run = False
 
-                elif self.video_frame > 0 and self.video_frame < 20:
-                    if self.tempo_atual - self.tempo_anterior > self.intervalo:
-                        self.video.append(coordenadas)
-                        self.video_frame += 1
+                            self.video = np.array(self.video)
 
-                        self.tempo_anterior = time.time() * 1000
-
-                elif self.video_frame > 0 and self.video_frame == 20:
-                    if self.tempo_atual - self.tempo_anterior > self.intervalo:
-                        self.video.append(coordenadas)
-                        self.video_frame = -1
-                        self.video_record_run = False
-
-                        self.video = np.array(self.video)
-
-                        self.draw_hand_image = True
-
-                        if self.agir:
+                            # self.draw_hand_image = True
                             self.predict(self.video)
 
-                        self.video = []
-            elif not self.mode_mouse:
-                self.searchOrder(coordenadas)
+                            self.video = []
+                elif not self.mode_mouse:
+                    self.searchOrder(coordenadas)
+                else:
+                    self.mouse(results)
+
+            elif self.mode_game:
+                self.StartDetection()
+
+    def verify_changes(self):
+        if self.change_mouse:
+            self.change_mouse = False
+
+            if self.mode_mouse:
+                self.stopMouseMode()
             else:
-                self.mouse(results)
+                self.activateMouseMode()
+
+        if self.change_game:
+            self.change_game = False
+
+            if self.mode_game:
+                self.stopGameMode()
+            else: 
+                self.activateGameMode()
+
+        self.tempo_atual = time.time() * 1000
+
+        if self.tempo_atual - self.last_summary >= 2000:
+            self.summary.emit("")
 
     def __getCoordinates(self, frame):
         w, h, _ = frame.shape
@@ -265,21 +316,6 @@ class VideoCaptureThread(QThread):
             previsoes = self.model.predict(dados)
             sys.stdout = sys.__stdout__
 
-        self.moves = [
-            'Fechar Telas',
-            'Print screen',
-            'Ativar modo mouse virtual',
-            'Aumentar o volume',
-            'Ir para o canal predileto',
-            'Abrir o explorador de arquivos',
-            'Diminuir o volume',
-            'Aumentar o brilho',
-            'Diminuir o brilho',
-            'Abrir a netflix',
-            'Abrir o disney plus',
-            'Confirmar'
-        ]
-
         self.descricoes = [
             'Fechando Telas',
             'Tirando print screen',
@@ -292,7 +328,8 @@ class VideoCaptureThread(QThread):
             'Diminuindo o brilho',
             'Abrindo a Netflix',
             'Abrindo Disney Plus',
-            'Confirmando'
+            'Ativando modo mouse virtual',
+            'Abrindo a Samsung'
         ]
 
         previsoes_tratadas = []
@@ -310,16 +347,16 @@ class VideoCaptureThread(QThread):
         self.summary.emit(texto)
         self.last_summary = time.time() * 1000
 
-        if previsao != 2 and previsao != 11:
-            
-            self.functionExcecute(previsao)
-        else:
-            self.activateMouseMode()
+        if self.agir:
+            if previsao != 2 and previsao != 11:
+                self.functionExcecute(previsao)
+            else:
+                self.activateMouseMode()
 
         previsoes_tratadas = []
 
     def load_model(self):
-        model = load_model('../models/modelTest.keras')
+        model = load_model('../models/modelTest2.keras')
 
         return model
     
@@ -385,6 +422,15 @@ class VideoCaptureThread(QThread):
         self.last_summary = time.time() * 1000
 
         self.mode_mouse = True
+        self.mode_game = False
+
+    def activateGameMode(self):
+        self.summary.emit("Entrando no modo jogos...")
+        self.change_game_sinal.emit(True)
+        self.last_summary = time.time() * 1000
+
+        self.mode_game = True
+        self.mode_mouse = False
 
     def mouse(self, results):
         if results.multi_hand_landmarks:
@@ -532,8 +578,136 @@ class VideoCaptureThread(QThread):
 
         self.mode_mouse = False
 
-        
-    
+    def stopGameMode(self):
+        self.summary.emit("Saindo do modo jogos...")
+        self.change_game_sinal.emit(False)
+        self.last_summary = time.time() * 1000
+
+        self.mode_game = False
+
+    def UpdateDetectedHandsHistory(self, all_hands):
+        self.xl = -1
+        self.yl = -1
+        self.xr = -1
+        self.yr = -1
+        if all_hands[0][0] != -1:
+            self.xl, self.yl = all_hands[0][1], all_hands[0][2]
+        if all_hands[1][0] != -1:
+            self.xr, self.yr = all_hands[1][1], all_hands[1][2]
+
+
+    def UpdateGamePad(self):
+        ang_joystick = self.wheel_angle*1.0+90
+
+        xjoystick = 32768 * math.cos(math.radians(ang_joystick))
+        yjoystick = 32768 * math.sin(math.radians(ang_joystick))
+
+        xjoystick = int(min(max(xjoystick, -32768), 32767))
+        yjoystick = int(min(max(yjoystick, -32768), 32767))
+        self.gamepad.left_joystick(x_value=xjoystick, y_value=yjoystick)  
+
+        if self.wheel_r > self.wheel_r_acc_min:
+            right_trigger_val = abs(255 * 3 * (self.wheel_r - self.wheel_r_acc_min)/(self.wheel_r_acc_max - self.wheel_r_acc_min))
+            right_trigger_val = min(255, max(0, int(right_trigger_val)))
+            left_trigger_val = 0
+        elif self.wheel_r<self.wheel_r_decc_min:
+            right_trigger_val = 0
+            left_trigger_val = abs(255 * 3 * (self.wheel_r - self.wheel_r_decc_min) / (self.wheel_r_decc_min - self.wheel_r_decc_max))
+            left_trigger_val = min(255,max(0, int(left_trigger_val)))
+        else:
+            right_trigger_val = 0
+            left_trigger_val = 0
+
+        self.gamepad.left_trigger(value=left_trigger_val)
+        self.gamepad.right_trigger(value=right_trigger_val)
+
+        self.gamepad.update()
+
+    def GetAvgHandValues(self, hand_to_avg):
+        if len(hand_to_avg) > 0:
+            hand_x = 0
+            hand_y = 0
+            for i in range(len(hand_to_avg)):
+                hand_x += hand_to_avg[i][1]
+                hand_y += hand_to_avg[i][2]
+            hand_x /= len(hand_to_avg)
+            hand_y /= len(hand_to_avg)
+        else:
+            hand_x, hand_y = -1, -1
+        return hand_x, hand_y
+
+    def UpdateWheelValues(self):
+        if self.xl != -1 and self.yl != -1 and self.xr != -1 and self.yr != -1:    
+            self.wheel_cent = (int((self.xl+self.xr)/2), int((self.yl+self.yr)/2))
+            self.wheel_r = int(math.sqrt(math.pow(self.xl-self.xr, 2) + math.pow(self.yl - self.yr, 2))/2)
+            self.wheel_angle = math.degrees(math.atan((self.yr - self.wheel_cent[1]) / (self.xr - self.wheel_cent[0])))
+
+            p1_alpha = self.wheel_angle + 45 + 180
+            p2_alpha = self.wheel_angle + 135 + 180
+            p3_alpha = self.wheel_angle + 270 + 180
+
+            self.wheel_spoke1 = (int(self.wheel_cent[0] + math.cos(math.radians(p1_alpha)) * self.wheel_r),
+                  int(self.wheel_cent[1] + math.sin(math.radians(p1_alpha)) * self.wheel_r))
+            self.wheel_spoke2 = (int(self.wheel_cent[0] + math.cos(math.radians(p2_alpha)) * self.wheel_r),
+                  int(self.wheel_cent[1] + math.sin(math.radians(p2_alpha)) * self.wheel_r))
+            self.wheel_spoke3 = (int(self.wheel_cent[0] + math.cos(math.radians(p3_alpha)) * self.wheel_r),
+                  int(self.wheel_cent[1] + math.sin(math.radians(p3_alpha)) * self.wheel_r))
+
+            
+            if self.wheel_r>self.wheel_r_acc_min:
+                self.wheel_color_cur = self.wheel_color_acc
+            elif self.wheel_r<self.wheel_r_decc_min:
+                self.wheel_color_cur = self.wheel_color_decc
+            else:
+                self.wheel_color_cur = self.wheel_color_norm
+
+    def StartDetection(self):
+         while True:
+            self.verify_changes()
+
+            if not self.mode_game:
+                return
+
+            success, image = self.cap.read()
+            if not success:
+                print("Ignoring empty camera frame.")
+                
+                continue
+
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+            all_hands = self.MHD.DetectSingleImg(image)           
+
+            self.UpdateDetectedHandsHistory(all_hands=all_hands)
+            self.UpdateWheelValues()
+            self.UpdateGamePad()
+            
+            for hands_cur in all_hands:
+                if hands_cur[0] == 1:
+                    image = cv2.circle(image, (int(hands_cur[1]), int(hands_cur[2])), 12, (0, 0, 0), -1)
+                    image = cv2.circle(image, (int(hands_cur[1]), int(hands_cur[2])), 10, (255, 255, 255), -1)
+            
+            if self.xl != -1 and self.yl != -1:
+                image = cv2.circle(image, (int(self.xl), int(self.yl)), 12, (0, 0, 0), -1)
+                image = cv2.circle(image, (int(self.xl), int(self.yl)), 10, (255, 0, 255), -1)
+            if self.xr != -1 and self.yr != -1:
+                image = cv2.circle(image, (int(self.xr), int(self.yr)), 12, (0, 0, 0), -1)
+                image = cv2.circle(image, (int(self.xr), int(self.yr)), 10, (255, 0, 255), -1)
+
+            image = cv2.circle(image, self.wheel_cent, self.wheel_r, self.wheel_color_cur, 5)
+            image = cv2.line(image, self.wheel_cent, self.wheel_spoke1, self.wheel_color_cur, 5)
+            image = cv2.line(image, self.wheel_cent, self.wheel_spoke2, self.wheel_color_cur, 5)
+            image = cv2.line(image, self.wheel_cent, self.wheel_spoke3, self.wheel_color_cur, 5)
+
+            image = cv2.convertScaleAbs(image, alpha=self.alpha, beta=self.beta)
+            image = cv2.flip(image, 1)
+
+
+            height, width, channel = image.shape
+            step = channel * width
+            qImg = QImage(image.data, width, height, step, QImage.Format_RGB888)
+            self.frameCaptured.emit(qImg)
+
 class UI():
     def __init__(self):
         super().__init__()
@@ -579,7 +753,7 @@ class UI():
         self.video_thread = VideoCaptureThread()
 
         self.button.setGeometry(650, 20, 30, 30)
-        self.Texto.setGeometry(20, 395, 200, 25)
+        self.Texto.setGeometry(20, 395, 250, 25)
         self.btn1.setGeometry(230, 435, 70, 25)
         self.btn2.setGeometry(310, 435, 70, 25)
         self.btn3.setGeometry(390, 435, 110, 25)
@@ -687,6 +861,7 @@ class UI():
         self.video_thread.summary.connect(self.SetText)
         self.video_thread.handImage.connect(self.SetHand)
         self.video_thread.change_mouse_sinal.connect(self.button_change)
+        self.video_thread.change_game_sinal.connect(self.button_change_2)
         self.video_thread.start()
 
     def __on_button_click(self):
@@ -812,16 +987,23 @@ class UI():
                 "QPushButton:hover {background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;}"
             )
 
+    def button_change_2(self, state):
+        if state:
+            self.btn5.setStyleSheet(
+                "QPushButton {background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;}"
+                "QPushButton:hover {background-color: #1e1e2e; border: 1px solid #EE4740; border-radius: 10px; color: #EE4740; font-size: 14px;}"
+            )            
+        else:
+            self.btn5.setStyleSheet(
+                "QPushButton {background-color: #1e1e2e; border: 1px solid #EE4740; border-radius: 10px; color: #EE4740; font-size: 14px;}"
+                "QPushButton:hover {background-color: #EE4740; border-radius: 10px; color: #CDD6F4; font-size: 14px;}"
+            )
+
     def mouse_activate(self):
         self.video_thread.change_mouse = True
 
     def game(self):
-        game_script_path = "../modules/games/window.py"
-        
-        full_path = os.path.join(os.path.dirname(__file__), game_script_path)
-        subprocess.Popen(["python", full_path], shell=True)
-        sys.exit()
-
+        self.video_thread.change_game = True
 
 class action():
     def __init__(self):
@@ -880,6 +1062,87 @@ class action():
 
     def Confirmar(self):
         pass
+
+    def Samsung(self):
+        webbrowser.open("https://samsung.com")
+
+
+class MediapipeHandDetection:
+
+    def __init__(self):
+
+        self.mp_drawing = mp.solutions.drawing_utils
+        self.mp_drawing_styles = mp.solutions.drawing_styles
+        self.mp_hands = mp.solutions.hands
+
+        self.detected_hands = [[-1, -1, -1], [-1, -1, -1]]
+
+    def CalcCenterHand(self, hand_landmarks):
+        cent_x = np.mean([hand_landmarks.landmark[point].x for point in self.mp_hands.HandLandmark])
+        cent_y = np.mean([hand_landmarks.landmark[point].y for point in self.mp_hands.HandLandmark])
+
+        return cent_x, cent_y
+
+    def DetectSingleImg(self, image):
+
+        with self.mp_hands.Hands(model_complexity=0, min_detection_confidence=0.5,
+                                 min_tracking_confidence=0.5) as hands:
+
+            image.flags.writeable = False
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            results = hands.process(image)
+
+            imageHeight, imageWidth, _ = image.shape
+
+            self.detected_hands = [[-1, -1, -1], [-1, -1, -1]]
+            if results.multi_hand_landmarks:
+                for i_hand in range(min(2, len(results.multi_hand_landmarks))):
+                    xcent, ycent = self.CalcCenterHand(results.multi_hand_landmarks[i_hand])
+                    self.detected_hands[i_hand] = [1, xcent * imageWidth, ycent * imageHeight]
+
+        return self.detected_hands
+
+    def StartDetection(self):
+        self.cap = cv2.VideoCapture(0)
+
+        with self.mp_hands.Hands(model_complexity=0, min_detection_confidence=0.5, min_tracking_confidence=0.5) as hands:
+            while True:
+                success, image = self.cap.read()
+                if not success:
+                    print("Ignoring empty camera frame.")
+                    continue
+
+                image.flags.writeable = False
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                results = hands.process(image)
+
+                imageHeight, imageWidth, _ = image.shape
+
+                self.detected_hands = [[-1,-1,-1],[-1,-1,-1]]
+                if results.multi_hand_landmarks:
+
+                    for i_hand in range(min(2,len(results.multi_hand_landmarks))):
+                        xcent, ycent = self.CalcCenterHand(results.multi_hand_landmarks[i_hand])
+                        self.detected_hands[i_hand] = [1, xcent*imageWidth, ycent*imageHeight]
+
+                image.flags.writeable = True
+                image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+                if results.multi_hand_landmarks:
+                    for hand_landmarks in results.multi_hand_landmarks:
+                        self.mp_drawing.draw_landmarks(
+                            image,
+                            hand_landmarks,
+                            self.mp_hands.HAND_CONNECTIONS,
+                            self.mp_drawing_styles.get_default_hand_landmarks_style(),
+                            self.mp_drawing_styles.get_default_hand_connections_style())
+                for hands_cur in self.detected_hands:
+                    if hands_cur[0] == 1:
+                        image = cv2.circle(image, (int(hands_cur[1]), int(hands_cur[2])), 10, (255,255,255), -1)
+                    print(hands_cur)
+                cv2.imshow('MediaPipe Hands', cv2.flip(image, 1))
+                if cv2.waitKey(5) & 0xFF == 27:
+                    break
+
 
 def main():
     ui = UI()

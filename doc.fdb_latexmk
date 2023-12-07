@@ -1,15 +1,15 @@
 # Fdb version 4
-["bibtex doc"] 1701957523 "doc.aux" "doc.bbl" "doc" 1701957523 0
+["bibtex doc"] 1701957970 "doc.aux" "doc.bbl" "doc" 1701957970 0
   "/usr/share/texlive/texmf-dist/bibtex/bst/base/unsrt.bst" 1292289607 18030 1376b4b231b50c66211e47e42eda2875 ""
-  "doc.aux" 1701957522 2367 912a634a8dbeb06aa7fcd5709ec7d9f5 "pdflatex"
+  "doc.aux" 1701957969 2367 912a634a8dbeb06aa7fcd5709ec7d9f5 "pdflatex"
   "references.bib" 0 -1 0 ""
   (generated)
   "doc.bbl"
   "doc.blg"
   (rewritten before read)
-["pdflatex"] 1701957520 "/home/krone/Barium/doc.tex" "doc.pdf" "doc" 1701957523 0
+["pdflatex"] 1701957968 "/home/krone/Barium/doc.tex" "doc.pdf" "doc" 1701957970 0
   "/etc/texmf/web2c/texmf.cnf" 1701277557 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/krone/Barium/doc.tex" 1701957487 12702 9f9f206d2b25061dd67daf2212bd6c74 ""
+  "/home/krone/Barium/doc.tex" 1701957963 12655 556b40ec9b25ba4effcaf99112c2c82c ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam10.tfm" 1246382020 916 f87d7c45f9c908e672703b83b72241a3 ""
@@ -168,10 +168,10 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1681034085 39561 34c98e380bf7c7201ee6a7909aff625a ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1701277597 4623455 fa0568a71dd9a288d6c226ee477506c6 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1701277622 7881927 241116f5ba182702e7a532f637477de3 ""
-  "doc.aux" 1701957522 2367 912a634a8dbeb06aa7fcd5709ec7d9f5 "pdflatex"
+  "doc.aux" 1701957969 2367 912a634a8dbeb06aa7fcd5709ec7d9f5 "pdflatex"
   "doc.bbl" 0 -1 0 "bibtex doc"
-  "doc.out" 1701957522 1983 b5837c32d79ee49703012162da1b2b32 "pdflatex"
-  "doc.tex" 1701957487 12702 9f9f206d2b25061dd67daf2212bd6c74 ""
+  "doc.out" 1701957969 1983 b5837c32d79ee49703012162da1b2b32 "pdflatex"
+  "doc.tex" 1701957963 12655 556b40ec9b25ba4effcaf99112c2c82c ""
   (generated)
   "doc.aux"
   "doc.log"

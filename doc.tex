@@ -156,7 +156,7 @@ To ensure the efficiency and efficacy of the neural network, we adopted a rigoro
 
 
 % NEURAL NETWORK with coefficients, arrows
-\begin{tikzpicture}[x=2.2cm,y=1.4cm]
+\begin{tikzpicture}[x=2.5cm,y=1.5cm]
   \message{^^JNeural network with arrows}
   \readlist\Nnod{4,5,5,5,3} % array of number of nodes per layer
   
@@ -187,9 +187,10 @@ To ensure the efficiency and efficacy of the neural network, we adopted a rigoro
  % Adjustments for label positioning
 % LABELS
 % Place the input layer label above the first layer
-\node at (0.5,2) {input layer};    % Adjust (x,y) coordinates as needed
-  \node at (2.5,2) {hidden layers};  % Adjust (x,y) coordinates as needed
-  \node at (4.5,2) {output layer};   % Adjust (x,y) coordinates as needed
+
+\node[above of=N1-1, node distance=1cm] {input layer};
+  \node[above of=N3-1, node distance=1cm] {hidden layers};
+  \node[above of=N5-1, node distance=1cm] {output layer};
 
 % Now draw the arrows from labels to layers if needed
   %\draw[->] (label-input) -- (N1-1);

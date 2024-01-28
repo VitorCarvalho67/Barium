@@ -12,7 +12,9 @@
   <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/c3067279-4aee-4b25-851b-8ebe5fe9449d" />
 </p>
 
-# Barium Human-Machine Interface (HMI)
+# Barium (HMI)
+
+[![GitHub license](https://img.shields.io/github/license/vitorcarvalho67/Barium)](vitorcarvalho67/Barium/blob/master/LICENSE) ![GitHub stars](https://img.shields.io/github/stars/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/languages/count/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/languages/top/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/repo-size/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/languages/code-size/vitorcarvalho67/Barium)
 
 An innovative software that utilizes neural networks, machine learning, and deep learning for tracking body movements, such as hands, enabling advanced interactions with the operating system, including predefined actions and a virtual mouse. Additionally, the project employs 4D neural network training techniques, where time is one of the dimensions, opening up revolutionary possibilities in various technology fields
 
@@ -71,6 +73,9 @@ python main.py
 ```
 The software should now be active, and you can interact with your computer using hand gestures.
 
+>[!WARNING]
+> Remember that you need a camera to use this software.
+
 ## Develop
 
 In the development process, we start with the creation of a data collection software to build our custom dataset. Next, we move on to developing a neural network, utilizing deep learning and convolutional neural networks (CNN). Finally, we create software that employs this network to recognize real-time movements and execute corresponding actions For more detailed information on developing Barium, please read the [Developer Guide][Dev]
@@ -96,13 +101,6 @@ In the development process, we start with the creation of a data collection soft
 [Alvaro Richard]: https://github.com/alvarorichard
 [Daniel Alvarenga]: https://github.com/Daniel-Alvarenga
 [Vitor Carvalho]: https://github.com/VitorCarvalho67
-
-## License
- The software is licensed under GPL-3.
-
-<p >
-  <img src="https://i.imgur.com/9kXfG6P.png" />
-</p>
 
 [dev]:DEV.md  
 

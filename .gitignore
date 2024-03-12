@@ -1,5 +1,4 @@
 venv/
-src/collector/
 bin/venv
 dist/
 build/

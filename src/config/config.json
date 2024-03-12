@@ -5,8 +5,8 @@
     "navegar": true
   },
   "video": {
-    "entrada": 2,
-    "saturacao": 1.56,
-    "brilho": 0
+    "entrada": 1,
+    "saturacao": 1.2,
+    "brilho": 19
   }
 }

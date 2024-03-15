@@ -2,6 +2,7 @@
     <p>
         <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_es">English</a> |
         <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_pt-br.md">Portugués</a> |
+       <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_ko.md">한국어</a> |
         <b>Español</b>
     </p>
 </h4>
@@ -11,6 +12,9 @@
 </p>
 
 # Barium Interfaz Hombre-Máquina (HMI)
+
+[![GitHub license](https://img.shields.io/github/license/vitorcarvalho67/Barium)](vitorcarvalho67/Barium/blob/master/LICENSE) ![GitHub stars](https://img.shields.io/github/stars/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/languages/count/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/languages/top/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/repo-size/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/languages/code-size/vitorcarvalho67/Barium)
+
 
 Un innovador software que utiliza redes neuronales, aprendizaje automático y aprendizaje profundo para el seguimiento de movimientos corporales, como las manos, permitiendo interacciones avanzadas con el sistema operativo, incluyendo acciones predefinidas y un ratón virtual. Además, el proyecto emplea técnicas de entrenamiento de redes neuronales 4D, donde el tiempo es una de las dimensiones, abriendo posibilidades revolucionarias en diversos campos tecnológicos.
 
@@ -90,13 +94,5 @@ En el proceso de desarrollo, comenzamos con la creación de un software de recol
 [Alvaro Richard]: https://github.com/alvarorichard
 [Daniel Alvarenga]: https://github.com/Daniel-Alvarenga
 [Vitor Carvalho]: https://github.com/VitorCarvalho67
-
-## Licencia
-El software está licenciado bajo GPL-3
-
-<p >
-  <img src="https://i.imgur.com/9kXfG6P.png" />
-</p>
-
 
 [dev]:DEV.md  

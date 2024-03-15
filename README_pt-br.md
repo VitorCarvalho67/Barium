@@ -12,7 +12,7 @@
   <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/c3067279-4aee-4b25-851b-8ebe5fe9449d" />
 </p>
 
-# Barium (HMI)
+# Barium (HMI) 
 
 [![GitHub license](https://img.shields.io/github/license/vitorcarvalho67/Barium)](vitorcarvalho67/Barium/blob/master/LICENSE) ![GitHub stars](https://img.shields.io/github/stars/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/languages/count/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/languages/top/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/repo-size/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/languages/code-size/vitorcarvalho67/Barium)
 

@@ -9,7 +9,7 @@
 </h4>
 
 <p align="center">
-  <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/c3067279-4aee-4b25-851b-8ebe5fe9449d" />
+  <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/3f585794-d93b-4e33-be0f-ae3e5945c170" />
 </p>
 
 # Barium (HMI)

@@ -12,7 +12,7 @@
   <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/c3067279-4aee-4b25-851b-8ebe5fe9449d" />
 </p>
 
-# Interface Homem-Máquina (HMI) Barium
+# Barium (HMI)
 
 [![GitHub license](https://img.shields.io/github/license/vitorcarvalho67/Barium)](vitorcarvalho67/Barium/blob/master/LICENSE)
 ![GitHub stars](https://img.shields.io/github/stars/vitorcarvalho67/Barium)
@@ -104,14 +104,6 @@ No processo de desenvolvimento, começamos com a criação de um software de col
 [Alvaro Richard]: https://github.com/alvarorichard
 [Daniel Alvarenga]: https://github.com/Daniel-Alvarenga
 [Vitor Carvalho]: https://github.com/VitorCarvalho67
-
-## Licença
- O software é licenciado sob a GPL-3.
-
-<p >
-  <img src="https://i.imgur.com/9kXfG6P.png" />
-</p>
-
 
 [dev]:DEV.md  
 

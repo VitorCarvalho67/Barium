@@ -2,7 +2,7 @@
     <p>
         <b>영어</b> |
         <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_pt-br.md">포르투갈어</a> |
-        <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_es.md">스페인어</a>
+        <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_es.md">스페인어</a> |
         <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_ko.md">스페인어</a>
     </p>
 </h4>
@@ -96,15 +96,6 @@ python main.py
 [Alvaro Richard]: https://github.com/alvarorichard
 [Daniel Alvarenga]: https://github.com/Daniel-Alvarenga
 [Vitor Carvalho]: https://github.com/VitorCarvalho67
-
-
-## 라이선스
- 소프트웨어는 GPL-3 하에 라이선스가 부여됩니다.
-
-<p >
-  <img src="https://i.imgur.com/9kXfG6P.png" />
-</p>
-
 
 
 [dev]:DEV.md  

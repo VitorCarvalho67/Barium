@@ -6,11 +6,19 @@
         <a href="https://github.com/VitorCarvalho67/Barium/blob/main/README_ko.md">스페인어</a>
     </p>
 </h4>
+
 <p align="center">
   <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/c3067279-4aee-4b25-851b-8ebe5fe9449d" />
 </p>
 
 # Barium 인간-기계 인터페이스 (HMI)
+
+[![GitHub license](https://img.shields.io/github/license/vitorcarvalho67/Barium)](vitorcarvalho67/Barium/blob/master/LICENSE)
+![GitHub stars](https://img.shields.io/github/stars/vitorcarvalho67/Barium)
+![GitHub language](https://img.shields.io/github/languages/top/vitorcarvalho67/Barium)
+![GitHub last commit](https://img.shields.io/github/last-commit/vitorcarvalho67/Barium)
+![GitHub repo size](https://img.shields.io/github/repo-size/vitorcarvalho67/Barium)
+![GitHub contributors](https://img.shields.io/github/contributors/vitorcarvalho67/Barium)
 
 신경망, 기계 학습 및 딥러닝을 활용하여 손과 같은 신체 움직임을 추적하고, 운영 체제와의 고급 상호 작용을 가능하게 하는 혁신적인 소프트웨어입니다. 또한, 이 프로젝트는 시간이 하나의 차원인 4D 신경망 훈련 기술을 사용하여 다양한 기술 분야에서 혁명적인 가능성을 엽니다.
 

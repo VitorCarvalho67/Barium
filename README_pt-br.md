@@ -12,9 +12,14 @@
   <img src="https://github.com/VitorCarvalho67/Barium/assets/102667323/c3067279-4aee-4b25-851b-8ebe5fe9449d" />
 </p>
 
-# Barium (HMI) 
+# Barium (HMI)
 
-[![GitHub license](https://img.shields.io/github/license/vitorcarvalho67/Barium)](vitorcarvalho67/Barium/blob/master/LICENSE) ![GitHub stars](https://img.shields.io/github/stars/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/languages/count/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/languages/top/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/repo-size/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/languages/code-size/vitorcarvalho67/Barium)
+[![GitHub license](https://img.shields.io/github/license/vitorcarvalho67/Barium)](vitorcarvalho67/Barium/blob/master/LICENSE)
+![GitHub stars](https://img.shields.io/github/stars/vitorcarvalho67/Barium)
+![GitHub language](https://img.shields.io/github/languages/top/vitorcarvalho67/Barium)
+![GitHub last commit](https://img.shields.io/github/last-commit/vitorcarvalho67/Barium)
+![GitHub repo size](https://img.shields.io/github/repo-size/vitorcarvalho67/Barium)
+![GitHub contributors](https://img.shields.io/github/contributors/vitorcarvalho67/Barium)
 
 Um software inovador que utiliza redes neurais, aprendizado de máquina e aprendizado profundo para rastrear movimentos corporais, como mãos, permitindo interações avançadas com o sistema operacional, incluindo ações predefinidas e um mouse virtual. Além disso, o projeto emprega técnicas de treinamento de redes neurais 4D, onde o tempo é uma das dimensões, abrindo possibilidades revolucionárias em diversos campos da tecnologia.
 

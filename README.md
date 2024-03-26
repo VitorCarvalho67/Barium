@@ -14,7 +14,12 @@
 
 # Barium (HMI)
 
-[![GitHub license](https://img.shields.io/github/license/vitorcarvalho67/Barium)](vitorcarvalho67/Barium/blob/master/LICENSE) ![GitHub stars](https://img.shields.io/github/stars/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/languages/count/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/languages/top/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/repo-size/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/languages/code-size/vitorcarvalho67/Barium)
+[![GitHub license](https://img.shields.io/github/license/vitorcarvalho67/Barium)](vitorcarvalho67/Barium/blob/master/LICENSE)
+![GitHub stars](https://img.shields.io/github/stars/vitorcarvalho67/Barium)
+![GitHub language](https://img.shields.io/github/languages/top/vitorcarvalho67/Barium)
+![GitHub last commit](https://img.shields.io/github/last-commit/vitorcarvalho67/Barium)
+![GitHub repo size](https://img.shields.io/github/repo-size/vitorcarvalho67/Barium)
+![GitHub contributors](https://img.shields.io/github/contributors/vitorcarvalho67/Barium)
 
 An innovative software that utilizes neural networks, machine learning, and deep learning for tracking body movements, such as hands, enabling advanced interactions with the operating system, including predefined actions and a virtual mouse. Additionally, the project employs 4D neural network training techniques, where time is one of the dimensions, opening up revolutionary possibilities in various technology fields
 

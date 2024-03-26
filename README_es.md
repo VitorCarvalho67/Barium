@@ -13,8 +13,12 @@
 
 # Barium Interfaz Hombre-Máquina (HMI)
 
-[![GitHub license](https://img.shields.io/github/license/vitorcarvalho67/Barium)](vitorcarvalho67/Barium/blob/master/LICENSE) ![GitHub stars](https://img.shields.io/github/stars/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/languages/count/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/languages/top/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/repo-size/vitorcarvalho67/Barium) ![GitHub stars](https://img.shields.io/github/languages/code-size/vitorcarvalho67/Barium)
-
+[![GitHub license](https://img.shields.io/github/license/vitorcarvalho67/Barium)](vitorcarvalho67/Barium/blob/master/LICENSE)
+![GitHub stars](https://img.shields.io/github/stars/vitorcarvalho67/Barium)
+![GitHub language](https://img.shields.io/github/languages/top/vitorcarvalho67/Barium)
+![GitHub last commit](https://img.shields.io/github/last-commit/vitorcarvalho67/Barium)
+![GitHub repo size](https://img.shields.io/github/repo-size/vitorcarvalho67/Barium)
+![GitHub contributors](https://img.shields.io/github/contributors/vitorcarvalho67/Barium)
 
 Un innovador software que utiliza redes neuronales, aprendizaje automático y aprendizaje profundo para el seguimiento de movimientos corporales, como las manos, permitiendo interacciones avanzadas con el sistema operativo, incluyendo acciones predefinidas y un ratón virtual. Además, el proyecto emplea técnicas de entrenamiento de redes neuronales 4D, donde el tiempo es una de las dimensiones, abriendo posibilidades revolucionarias en diversos campos tecnológicos.
 
